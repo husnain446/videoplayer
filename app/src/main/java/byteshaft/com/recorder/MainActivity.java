@@ -1,6 +1,7 @@
 package byteshaft.com.recorder;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.hardware.Camera;
 import android.media.AudioManager;
 import android.media.CamcorderProfile;
@@ -22,6 +23,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
     SurfaceView display;
     MediaRecorder mediaRecorder;
     Button rec;
+    Button videoPlayer;
     boolean isRecording = false;
     String filePath = (Environment.getExternalStoragePublicDirectory("Example.mp4").getAbsolutePath());
 
@@ -41,6 +43,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
         mHolder = display.getHolder();
         mHolder.addCallback(this);
         display.setOnClickListener(this);
+        videoPlayer = (Button) findViewById(R.id.button);
+        videoPlayer.setOnClickListener(this);
     }
 
     private void openCamera() {
@@ -148,6 +152,15 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
             case R.id.display:
                 playVideo();
                 break;
+            case R.id.button:
+                openVideoActivity();
+                break;
         }
+    }
+
+    private void openVideoActivity() {
+        Intent intent = new Intent(this, VideoActivity.class);
+        intent.putExtra("file", filePath);
+        startActivity(intent);
     }
 }
