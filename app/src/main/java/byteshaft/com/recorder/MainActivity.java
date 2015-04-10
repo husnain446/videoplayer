@@ -15,39 +15,39 @@ import android.view.View;
 import android.widget.Button;
 import java.io.IOException;
 
-
 public class MainActivity extends Activity implements SurfaceHolder.Callback,
         View.OnClickListener {
-
     Camera mCamera;
     SurfaceHolder mHolder;
     SurfaceView display;
     MediaRecorder mediaRecorder;
-    Button rec, stop, open, play;
+    Button rec;
+    boolean isRecording = false;
     String filePath = (Environment.getExternalStoragePublicDirectory("Example.mp4").getAbsolutePath());
+
+    private static class CAMERA {
+        private static class ORIENTATION {
+            static int PORTRAIT = 90;
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        open = (Button) findViewById(R.id.open);
         rec = (Button) findViewById(R.id.recorder);
-        stop = (Button) findViewById(R.id.stop);
-        play = (Button) findViewById(R.id.play);
-        open.setOnClickListener(this);
         rec.setOnClickListener(this);
-        stop.setOnClickListener(this);
-        play.setOnClickListener(this);
         display = (SurfaceView) findViewById(R.id.display);
         mHolder = display.getHolder();
         mHolder.addCallback(this);
-
+        display.setOnClickListener(this);
     }
 
     private void openCamera() {
         mCamera = Camera.open();
         try {
             mCamera.setPreviewDisplay(mHolder);
+            mCamera.setDisplayOrientation(CAMERA.ORIENTATION.PORTRAIT);
             mCamera.startPreview();
         } catch (IOException e) {
             e.printStackTrace();
@@ -57,7 +57,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-
+        openCamera();
     }
 
     @Override
@@ -81,11 +81,14 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
 
     private void recordVideo() {
         mediaRecorder = new MediaRecorder();
+        if (mCamera == null) {
+           openCamera();
+        }
         mCamera.unlock();
         mediaRecorder.setCamera(mCamera);
         mediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
         mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        CamcorderProfile camcorderProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_480P);
+        CamcorderProfile camcorderProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_720P);
         mediaRecorder.setProfile(camcorderProfile);
         mediaRecorder.setOrientationHint(90);
         mediaRecorder.setOutputFile(filePath);
@@ -128,16 +131,21 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.open:
-                openCamera();
-                break;
             case R.id.recorder:
-                recordVideo();
+                if (!isRecording) {
+                    recordVideo();
+                    isRecording = true;
+                    rec.setText("stop");
+                } else {
+                    mediaRecorder.stop();
+                    mediaRecorder.release();
+                    mCamera.release();
+                    mCamera = null;
+                    isRecording = false;
+                    rec.setText("record");
+                }
                 break;
-            case R.id.stop:
-                mediaRecorder.stop();
-                break;
-            case R.id.play:
+            case R.id.display:
                 playVideo();
                 break;
         }
