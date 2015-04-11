@@ -1,7 +1,6 @@
 package byteshaft.com.recorder;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.hardware.Camera;
 import android.media.AudioManager;
 import android.media.CamcorderProfile;
@@ -14,18 +13,35 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
+
 import java.io.IOException;
 
 public class MainActivity extends Activity implements SurfaceHolder.Callback,
-        View.OnClickListener {
+        View.OnClickListener, View.OnLongClickListener {
     Camera mCamera;
     SurfaceHolder mHolder;
     SurfaceView display;
     MediaRecorder mediaRecorder;
     Button rec;
     Button videoPlayer;
+    int seekPosition;
+    MediaPlayer mediaPlayer;
     boolean isRecording = false;
     String filePath = (Environment.getExternalStoragePublicDirectory("Example.mp4").getAbsolutePath());
+    VideoOverlay overlay;
+
+    @Override
+    public boolean onLongClick(View v) {
+        switch (v.getId()) {
+            case R.id.display:
+                if (mediaPlayer.isPlaying()) {
+                    mediaPlayer.pause();
+                    seekPosition = mediaPlayer.getCurrentPosition();
+                    startPlayback();
+                }
+        }
+        return false;
+    }
 
     private static class CAMERA {
         private static class ORIENTATION {
@@ -43,8 +59,11 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
         mHolder = display.getHolder();
         mHolder.addCallback(this);
         display.setOnClickListener(this);
+        display.setOnLongClickListener(this);
         videoPlayer = (Button) findViewById(R.id.button);
         videoPlayer.setOnClickListener(this);
+        overlay = new VideoOverlay(getApplicationContext());
+
     }
 
     private void openCamera() {
@@ -114,7 +133,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
 
     private void playVideo() {
         Uri uri1 = Uri.parse(filePath);
-        MediaPlayer mediaPlayer = new MediaPlayer();
+        mediaPlayer = new MediaPlayer();
         if (mediaPlayer.isPlaying()){
             mediaPlayer.reset();
         }
@@ -153,14 +172,14 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
                 playVideo();
                 break;
             case R.id.button:
-                openVideoActivity();
+                startPlayback();
                 break;
         }
     }
 
-    private void openVideoActivity() {
-        Intent intent = new Intent(this, VideoActivity.class);
-        intent.putExtra("file", filePath);
-        startActivity(intent);
+    private void startPlayback() {
+        overlay.setVideoFile(filePath);
+        overlay.setVideoStartPosition(seekPosition);
+        overlay.startPlayback();
     }
 }
