@@ -18,30 +18,16 @@ import java.io.IOException;
 
 public class MainActivity extends Activity implements SurfaceHolder.Callback,
         View.OnClickListener, View.OnLongClickListener {
-    Camera mCamera;
-    SurfaceHolder mHolder;
-    SurfaceView display;
-    MediaRecorder mediaRecorder;
-    Button rec;
-    Button videoPlayer;
-    int seekPosition;
-    MediaPlayer mediaPlayer;
-    boolean isRecording = false;
-    String filePath = (Environment.getExternalStoragePublicDirectory("Example.mp4").getAbsolutePath());
-    VideoOverlay overlay;
 
-    @Override
-    public boolean onLongClick(View v) {
-        switch (v.getId()) {
-            case R.id.display:
-                if (mediaPlayer.isPlaying()) {
-                    mediaPlayer.pause();
-                    seekPosition = mediaPlayer.getCurrentPosition();
-                    startPlayback();
-                }
-        }
-        return false;
-    }
+    private Camera mCamera;
+    private SurfaceHolder mHolder;
+    private MediaRecorder mediaRecorder;
+    private Button rec;
+    private int seekPosition;
+    private MediaPlayer mediaPlayer;
+    private boolean isRecording = false;
+    private String filePath = (Environment.getExternalStoragePublicDirectory("Example.mp4").getAbsolutePath());
+    private VideoOverlay overlay;
 
     private static class CAMERA {
         private static class ORIENTATION {
@@ -55,27 +41,61 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
         setContentView(R.layout.activity_main);
         rec = (Button) findViewById(R.id.recorder);
         rec.setOnClickListener(this);
-        display = (SurfaceView) findViewById(R.id.display);
+        SurfaceView display = (SurfaceView) findViewById(R.id.display);
         mHolder = display.getHolder();
         mHolder.addCallback(this);
         display.setOnClickListener(this);
         display.setOnLongClickListener(this);
-        videoPlayer = (Button) findViewById(R.id.button);
+        Button videoPlayer = (Button) findViewById(R.id.button);
         videoPlayer.setOnClickListener(this);
         overlay = new VideoOverlay(getApplicationContext());
 
     }
 
-    private void openCamera() {
-        mCamera = Camera.open();
-        try {
-            mCamera.setPreviewDisplay(mHolder);
-            mCamera.setDisplayOrientation(CAMERA.ORIENTATION.PORTRAIT);
-            mCamera.startPreview();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        releaseCamera();
 
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.recorder:
+                if (!isRecording) {
+                    recordVideo();
+                    isRecording = true;
+                    rec.setText("stop");
+                } else {
+                    mediaRecorder.stop();
+                    mediaRecorder.release();
+                    mCamera.release();
+                    mCamera = null;
+                    isRecording = false;
+                    rec.setText("record");
+                }
+                break;
+            case R.id.display:
+                playVideo();
+                break;
+            case R.id.button:
+                startPlayback();
+                break;
+        }
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        switch (v.getId()) {
+            case R.id.display:
+                if (mediaPlayer.isPlaying()) {
+                    mediaPlayer.pause();
+                    seekPosition = mediaPlayer.getCurrentPosition();
+                    startPlayback();
+                }
+        }
+        return false;
     }
 
     @Override
@@ -93,13 +113,16 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
 
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (mCamera != null) {
-            mCamera.release();
-            mCamera = null;
+    private void openCamera() {
+        mCamera = Camera.open();
+        try {
+            mCamera.setPreviewDisplay(mHolder);
+            mCamera.setDisplayOrientation(CAMERA.ORIENTATION.PORTRAIT);
+            mCamera.startPreview();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
     }
 
     private void recordVideo() {
@@ -151,35 +174,16 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
         mediaPlayer.start();
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.recorder:
-                if (!isRecording) {
-                    recordVideo();
-                    isRecording = true;
-                    rec.setText("stop");
-                } else {
-                    mediaRecorder.stop();
-                    mediaRecorder.release();
-                    mCamera.release();
-                    mCamera = null;
-                    isRecording = false;
-                    rec.setText("record");
-                }
-                break;
-            case R.id.display:
-                playVideo();
-                break;
-            case R.id.button:
-                startPlayback();
-                break;
-        }
-    }
-
     private void startPlayback() {
         overlay.setVideoFile(filePath);
         overlay.setVideoStartPosition(seekPosition);
         overlay.startPlayback();
+    }
+
+    private void releaseCamera() {
+        if (mCamera != null) {
+            mCamera.release();
+            mCamera = null;
+        }
     }
 }
