@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">Recorder</string>
-
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
     <string name="title_activity_video_player">VideoPlayer</string>
+    <string name="title_activity_video">VideoActivity</string>
 </resources>

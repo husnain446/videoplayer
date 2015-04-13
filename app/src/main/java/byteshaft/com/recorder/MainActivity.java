@@ -2,7 +2,8 @@ package byteshaft.com.recorder;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.net.Uri;
+import android.hardware.Camera;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
 import android.view.SurfaceHolder;
@@ -13,14 +14,13 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SlidingDrawer;
-import android.widget.Toast;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-@SuppressWarnings("deprecation")
-public class MainActivity extends Activity implements SurfaceHolder.Callback,
-      ListView.OnItemClickListener {
+public class MainActivity extends Activity implements ListView.OnItemClickListener {
+
+    private VideoOverlay overlay;
 
     SurfaceView display;
     SlidingDrawer sd;
@@ -42,7 +42,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
         if (!folder.exists()) {
             folder.mkdir();
         }
-
+        overlay = new VideoOverlay(getApplicationContext());
         filePath = folder + "/" + "Video" + ".mp4";
 
         ListView list = mHelper.getListView();
@@ -77,23 +77,14 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
         }
     }
 
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-    }
-
     private void allReferences() {
-        display = (SurfaceView) findViewById(R.id.display);
-        mHelper.mHolder = display.getHolder();
-        mHelper.mHolder.addCallback(this);
         sd = (SlidingDrawer) findViewById(R.id.slidingDrawer);
         li = (LinearLayout) findViewById(R.id.content);
     }
+
+//    private void startPlayback() {
+//        overlay.setVideoFile(filePath);
+//        overlay.setVideoStartPosition(seekPosition);
+//        overlay.startPlayback();
+//    }
 }

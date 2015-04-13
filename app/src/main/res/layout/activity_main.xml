@@ -10,18 +10,6 @@
         android:orientation="vertical"
         tools:context=".MainActivity"
         >
-    <SurfaceView
-        android:id="@+id/display"
-        android:layout_width="fill_parent"
-        android:layout_height="430dp"
-        android:clickable="true"
-        />
-    <Button
-        android:text="play"
-        android:id="@+id/recorder"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
     </LinearLayout>
     <SlidingDrawer
         android:layout_width="wrap_content"

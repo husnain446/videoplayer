@@ -5,12 +5,14 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.hardware.Camera;
 import android.media.AudioManager;
-import android.media.CamcorderProfile;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Environment;
+import android.util.TypedValue;
 import android.view.SurfaceHolder;
+import android.view.View;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -21,9 +23,6 @@ import java.util.ArrayList;
 @SuppressWarnings("deprecation")
 public class Helpers extends ContextWrapper {
 
-    MediaRecorder mediaRecorder;
-    Camera mCamera;
-    SurfaceHolder mHolder;
     File[] getVideos;
     ArrayAdapter<String> modeAdapter;
     String[] realVideos;
@@ -35,8 +34,53 @@ public class Helpers extends ContextWrapper {
         super(base);
     }
 
-    void playVideo(Uri uri, SurfaceHolder holder) {
-        mediaPlayer = new MediaPlayer();
+    int getInt(float input) {
+        return Math.round(input);
+    }
+
+    int getDensityPixels(int pixels) {
+        float dp = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, pixels, getResources().getDisplayMetrics());
+        return getInt(dp);
+    }
+
+    boolean isVideoPortrait(MediaPlayer mp) {
+        return mp.getVideoHeight() > mp.getVideoWidth();
+
+    }
+
+    int getHorizontalCenterOfView(View v) {
+        return v.getWidth() / 2;
+    }
+
+    int getVerticalCenterOfView(View v) {
+        return v.getHeight() / 2;
+    }
+
+    MediaPlayer getMediaPlayer() {
+        return new MediaPlayer();
+    }
+
+    WindowManager getWindowManager() {
+        return (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+    }
+
+    void togglePlayback(MediaPlayer mediaPlayer) {
+        if (mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
+        } else {
+            mediaPlayer.start();
+        }
+    }
+
+    void destroyVideoSurface(WindowManager mWindowManager, View view) {
+        if (mWindowManager != null) {
+            mWindowManager.removeView(view);
+        }
+    }
+
+    void playVideo(MediaPlayer mediaPlayer, Uri uri, SurfaceHolder holder) {
+
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.reset();
         }
