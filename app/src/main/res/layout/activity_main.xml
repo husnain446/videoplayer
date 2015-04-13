@@ -1,20 +1,48 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
-
+    >
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".MainActivity"
+        >
     <SurfaceView
         android:id="@+id/display"
         android:layout_width="fill_parent"
-        android:layout_height="500dp"
+        android:layout_height="430dp"
         android:clickable="true"
         />
     <Button
-        android:text="record"
+        android:text="play"
         android:id="@+id/recorder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/display"
-        android:layout_centerHorizontal="true" />
-</RelativeLayout>
+        />
+    </LinearLayout>
+    <SlidingDrawer
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:content="@+id/content"
+        android:handle="@+id/handle"
+        android:id="@+id/slidingDrawer"
+        android:layout_gravity="center_horizontal">
+
+        <LinearLayout
+            android:id="@+id/content"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical"
+            android:background="#ffffff"
+            >
+        <Button
+            android:id="@+id/handle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Handle" />
+        </LinearLayout>
+    </SlidingDrawer>
+  </FrameLayout>
