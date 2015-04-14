@@ -12,9 +12,9 @@ import android.view.WindowManager;
 
 
 public class VideoPlayer extends Activity implements SurfaceHolder.Callback,
-        MediaPlayer.OnCompletionListener, SurfaceView.OnLongClickListener {
+        MediaPlayer.OnCompletionListener, SurfaceView.OnLongClickListener,
+        MediaPlayer.OnPreparedListener {
 
-    Helpers mHelper = null;
     private Uri uri = null;
     private MediaPlayer mMediaPlayer = null;
     private VideoOverlay mVideoOverlay = null;
@@ -37,6 +37,7 @@ public class VideoPlayer extends Activity implements SurfaceHolder.Callback,
         uri = Uri.parse(videoPath);
         mMediaPlayer = new MediaPlayer();
         mMediaPlayer.setOnCompletionListener(this);
+        mMediaPlayer.setOnPreparedListener(this);
         SurfaceView mSurfaceView = (SurfaceView) findViewById(R.id.display);
         mSurfaceView.setOnLongClickListener(this);
         SurfaceHolder surfaceHolder = mSurfaceView.getHolder();
@@ -46,9 +47,15 @@ public class VideoPlayer extends Activity implements SurfaceHolder.Callback,
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        mMediaPlayer.release();
+    }
+
+    @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        mHelper = new Helpers(getApplicationContext());
-        mHelper.playVideo(mMediaPlayer, uri, holder);
+        Helpers helpers = new Helpers(getApplicationContext());
+        helpers.prepareMediaPlayer(mMediaPlayer, uri, holder);
 
     }
 
@@ -63,8 +70,12 @@ public class VideoPlayer extends Activity implements SurfaceHolder.Callback,
     }
 
     @Override
-    public void onCompletion(MediaPlayer mp) {
+    public void onPrepared(MediaPlayer mp) {
+        mp.start();
+    }
 
+    @Override
+    public void onCompletion(MediaPlayer mp) {
         finish();
     }
 
@@ -81,11 +92,5 @@ public class VideoPlayer extends Activity implements SurfaceHolder.Callback,
         WindowManager.LayoutParams layoutParams = getWindow().getAttributes();
         layoutParams.screenBrightness = value;
         getWindow().setAttributes(layoutParams);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mMediaPlayer.release();
     }
 }

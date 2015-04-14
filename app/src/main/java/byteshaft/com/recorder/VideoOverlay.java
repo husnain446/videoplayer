@@ -4,7 +4,6 @@ package byteshaft.com.recorder;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.graphics.PixelFormat;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.view.Gravity;
@@ -15,12 +14,9 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 
-import java.io.IOException;
-
 public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callback,
         View.OnTouchListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener {
 
-    private SurfaceHolder mHolder;
     private WindowManager mWindowManager;
     private String fileRepo;
     private int position;
@@ -37,8 +33,8 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
         mVideoOverlayLayout = inflater.inflate(R.layout.video_surface, null);
         SurfaceView surfaceView = (SurfaceView) mVideoOverlayLayout.findViewById(R.id.surface);
 
-        mHolder = surfaceView.getHolder();
-        mHolder.addCallback(this);
+        SurfaceHolder holder = surfaceView.getHolder();
+        holder.addCallback(this);
         surfaceView.setOnTouchListener(this);
     }
 
@@ -58,7 +54,11 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        playVideo();
+        Uri uri1 = Uri.parse(fileRepo);
+        mediaPlayer = mHelpers.getMediaPlayer();
+        mediaPlayer.setOnCompletionListener(this);
+        mediaPlayer.setOnPreparedListener(this);
+        mHelpers.prepareMediaPlayer(mediaPlayer, uri1, holder);
     }
 
     @Override
@@ -91,25 +91,6 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
         return params;
     }
 
-    private void playVideo() {
-        Uri uri1 = Uri.parse(fileRepo);
-        mediaPlayer = mHelpers.getMediaPlayer();
-        mediaPlayer.setOnCompletionListener(this);
-        mediaPlayer.setOnPreparedListener(this);
-        if (mediaPlayer.isPlaying()){
-            mediaPlayer.reset();
-        }
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mediaPlayer.setDisplay(mHolder);
-
-        try {
-            mediaPlayer.setDataSource(getApplicationContext(), uri1);
-            mediaPlayer.prepare();
-        } catch (IllegalArgumentException | IllegalStateException | IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         switch (event.getAction()) {
@@ -120,7 +101,7 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
                 int x = mHelpers.getHorizontalCenterOfView(v);
                 int y = mHelpers.getVerticalCenterOfView(v);
                 params.x = (int) (event.getRawX() - x);
-                params.y = (int) (event.getRawY() - y );
+                params.y = (int) (event.getRawY() - y);
                 mWindowManager.updateViewLayout(mVideoOverlayLayout, params);
                 clicked = false;
                 return true;

@@ -9,15 +9,13 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 public class MainActivity extends ActionBarActivity implements ListView.OnItemClickListener {
 
-    private RelativeLayout relativeLayout;
     static String filePath;
-    Helpers mHelper;
+    private Helpers mHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,14 +23,10 @@ public class MainActivity extends ActionBarActivity implements ListView.OnItemCl
         setContentView(R.layout.activity_main);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         mHelper = new Helpers(this);
-        allReferences();
-        Calendar c = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String strDate = sdf.format(c.getTime());
+        RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.mainLayout);
         if (!mHelper.folder.exists()) {
             mHelper.folder.mkdir();
         }
-        VideoOverlay overlay = new VideoOverlay(getApplicationContext());
         filePath = mHelper.folder + "/" + "Video" + ".mp4";
 
         ListView list = mHelper.getListView();
@@ -65,14 +59,4 @@ public class MainActivity extends ActionBarActivity implements ListView.OnItemCl
             }
         }
     }
-
-    private void allReferences() {
-        relativeLayout = (RelativeLayout) findViewById(R.id.mainLayout);
-    }
-
-//    private void startPlayback() {
-//        overlay.setVideoFile(filePath);
-//        overlay.setVideoStartPosition(seekPosition);
-//        overlay.startPlayback();
-//    }
 }
