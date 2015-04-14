@@ -15,9 +15,7 @@ import java.util.Calendar;
 
 public class MainActivity extends ActionBarActivity implements ListView.OnItemClickListener {
 
-    private VideoOverlay overlay;
-    RelativeLayout relativeLayout;
-    String strDate;
+    private RelativeLayout relativeLayout;
     static String filePath;
     Helpers mHelper;
 
@@ -30,11 +28,11 @@ public class MainActivity extends ActionBarActivity implements ListView.OnItemCl
         allReferences();
         Calendar c = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        strDate = sdf.format(c.getTime());
+        String strDate = sdf.format(c.getTime());
         if (!mHelper.folder.exists()) {
             mHelper.folder.mkdir();
         }
-        overlay = new VideoOverlay(getApplicationContext());
+        VideoOverlay overlay = new VideoOverlay(getApplicationContext());
         filePath = mHelper.folder + "/" + "Video" + ".mp4";
 
         ListView list = mHelper.getListView();

@@ -25,7 +25,7 @@ public class Helpers extends ContextWrapper {
     String[] realVideos;
     static boolean listDisplay = false;
     ListView list;
-    File folder = new File(Environment.getExternalStorageDirectory() + "/DCIM/Camera/");
+    File folder = new File(Environment.getExternalStorageDirectory() + "/WhatsApp/Media/WhatsApp Video");
 
 
     public Helpers(Context base) {
@@ -121,4 +121,6 @@ public class Helpers extends ContextWrapper {
         }
         return data;
     }
+
+
 }
