@@ -79,8 +79,6 @@ public class Helpers extends ContextWrapper {
         }
         mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mp.setDisplay(holder);
-        mp.attachAuxEffect(0);
-        mp.getDuration();
         try {
             mp.setDataSource(getApplicationContext(), videoUri);
             mp.prepare();

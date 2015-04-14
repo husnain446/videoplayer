@@ -15,7 +15,7 @@ import android.view.View;
 import android.view.WindowManager;
 
 public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callback,
-        View.OnTouchListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener {
+        View.OnTouchListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener  {
 
     private WindowManager mWindowManager;
     private String fileRepo;
@@ -32,7 +32,6 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         mVideoOverlayLayout = inflater.inflate(R.layout.video_surface, null);
         SurfaceView surfaceView = (SurfaceView) mVideoOverlayLayout.findViewById(R.id.surface);
-
         SurfaceHolder holder = surfaceView.getHolder();
         holder.addCallback(this);
         surfaceView.setOnTouchListener(this);
@@ -136,4 +135,5 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
         mp.seekTo(position);
         mp.start();
     }
+
 }
