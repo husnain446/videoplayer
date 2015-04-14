@@ -18,6 +18,7 @@ import android.widget.Button;
 public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callback,
         View.OnTouchListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener, View.OnClickListener {
 
+
     private WindowManager mWindowManager;
     private String fileRepo;
     private int position;
@@ -142,15 +143,12 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
         mp.seekTo(position);
         mp.start();
     }
-
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.bClose:
                 mediaPlayer.stop();
                 mHelpers.destroyVideoSurface(mWindowManager, mVideoOverlayLayout);
-
-
         }
     }
 }
