@@ -5,7 +5,6 @@ import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -82,5 +81,11 @@ public class VideoPlayer extends Activity implements SurfaceHolder.Callback,
         WindowManager.LayoutParams layoutParams = getWindow().getAttributes();
         layoutParams.screenBrightness = value;
         getWindow().setAttributes(layoutParams);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mMediaPlayer.release();
     }
 }
