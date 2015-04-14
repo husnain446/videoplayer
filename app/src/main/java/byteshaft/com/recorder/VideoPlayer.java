@@ -20,6 +20,13 @@ public class VideoPlayer extends Activity implements SurfaceHolder.Callback,
     private VideoOverlay mVideoOverlay = null;
     private String videoPath = null;
 
+    private static class Screen {
+        static class Brightness {
+            static final float HIGH = 1f;
+            static final float DEFAULT = -1f;
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +44,12 @@ public class VideoPlayer extends Activity implements SurfaceHolder.Callback,
         surfaceHolder.addCallback(this);
         mVideoOverlay = new VideoOverlay(getApplicationContext());
         setScreenBrightness(Screen.Brightness.HIGH);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mMediaPlayer.release();
     }
 
     @Override
@@ -79,12 +92,5 @@ public class VideoPlayer extends Activity implements SurfaceHolder.Callback,
         WindowManager.LayoutParams layoutParams = getWindow().getAttributes();
         layoutParams.screenBrightness = value;
         getWindow().setAttributes(layoutParams);
-    }
-
-    private static class Screen {
-        static class Brightness {
-            static final float HIGH = 1f;
-            static final float DEFAULT = -1f;
-        }
     }
 }

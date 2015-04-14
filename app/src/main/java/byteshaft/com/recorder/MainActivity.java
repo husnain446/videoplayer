@@ -11,7 +11,6 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 
 import java.io.File;
-import java.util.Calendar;
 
 public class MainActivity extends ActionBarActivity implements ListView.OnItemClickListener {
 
