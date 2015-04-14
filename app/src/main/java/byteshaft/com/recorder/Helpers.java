@@ -21,7 +21,7 @@ import java.util.ArrayList;
 public class Helpers extends ContextWrapper {
 
     static boolean listDisplay = false;
-    File folder = new File(Environment.getExternalStorageDirectory() + "/DCIM/Camera/");
+    File folder = new File(Environment.getExternalStorageDirectory() + "/WhatsApp/Media/WhatsApp Video");
 
     public Helpers(Context base) {
         super(base);

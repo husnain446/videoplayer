@@ -1,6 +1,7 @@
 package byteshaft.com.recorder;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -85,6 +86,8 @@ public class VideoPlayer extends Activity implements SurfaceHolder.Callback,
         mVideoOverlay.setVideoFile(videoPath);
         mVideoOverlay.setVideoStartPosition(mMediaPlayer.getCurrentPosition());
         mVideoOverlay.startPlayback();
+        finish();
+        showDesktop();
         return false;
     }
 
@@ -92,5 +95,12 @@ public class VideoPlayer extends Activity implements SurfaceHolder.Callback,
         WindowManager.LayoutParams layoutParams = getWindow().getAttributes();
         layoutParams.screenBrightness = value;
         getWindow().setAttributes(layoutParams);
+    }
+
+    private void showDesktop() {
+        Intent startMain = new Intent(Intent.ACTION_MAIN);
+        startMain.addCategory(Intent.CATEGORY_HOME);
+        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(startMain);
     }
 }
