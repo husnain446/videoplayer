@@ -13,9 +13,10 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 
 public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callback,
-        View.OnTouchListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener {
+        View.OnTouchListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener, View.OnClickListener {
 
     private WindowManager mWindowManager;
     private String fileRepo;
@@ -25,6 +26,8 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
     private boolean clicked = false;
     private View mVideoOverlayLayout;
     private Helpers mHelpers = null;
+    VideoOverlay videoOverlay;
+
 
     public VideoOverlay(Context context) {
         super(context);
@@ -32,10 +35,13 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         mVideoOverlayLayout = inflater.inflate(R.layout.video_surface, null);
         SurfaceView surfaceView = (SurfaceView) mVideoOverlayLayout.findViewById(R.id.surface);
-
         SurfaceHolder holder = surfaceView.getHolder();
         holder.addCallback(this);
         surfaceView.setOnTouchListener(this);
+        Button close = (Button) mVideoOverlayLayout.findViewById(R.id.bClose);
+        close.setOnClickListener(this);
+        videoOverlay = this;
+
     }
 
     void setVideoFile(String file) {
@@ -135,5 +141,16 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
         }
         mp.seekTo(position);
         mp.start();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.bClose:
+                mediaPlayer.stop();
+                mHelpers.destroyVideoSurface(mWindowManager, mVideoOverlayLayout);
+
+
+        }
     }
 }
