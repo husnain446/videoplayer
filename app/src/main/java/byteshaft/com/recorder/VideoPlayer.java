@@ -1,9 +1,11 @@
 package byteshaft.com.recorder;
 
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -12,7 +14,6 @@ import android.view.View;
 public class VideoPlayer extends Activity implements SurfaceHolder.Callback,
         MediaPlayer.OnCompletionListener, SurfaceView.OnLongClickListener {
 
-    private SurfaceView mSurfaceView = null;
     Helpers mHelper = null;
     private Uri uri = null;
     private MediaPlayer mMediaPlayer = null;
@@ -23,12 +24,13 @@ public class VideoPlayer extends Activity implements SurfaceHolder.Callback,
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_player);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         Bundle bundle = getIntent().getExtras();
         videoPath = bundle.getString("videoUri");
         uri = Uri.parse(videoPath);
         mMediaPlayer = new MediaPlayer();
         mMediaPlayer.setOnCompletionListener(this);
-        mSurfaceView = (SurfaceView) findViewById(R.id.display);
+        SurfaceView mSurfaceView = (SurfaceView) findViewById(R.id.display);
         mSurfaceView.setOnLongClickListener(this);
         SurfaceHolder surfaceHolder = mSurfaceView.getHolder();
         surfaceHolder.addCallback(this);
@@ -54,6 +56,7 @@ public class VideoPlayer extends Activity implements SurfaceHolder.Callback,
 
     @Override
     public void onCompletion(MediaPlayer mp) {
+
         finish();
     }
 

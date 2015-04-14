@@ -1,30 +1,22 @@
 package byteshaft.com.recorder;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.hardware.Camera;
-import android.media.MediaPlayer;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.os.Environment;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.SlidingDrawer;
+import android.widget.RelativeLayout;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public class MainActivity extends Activity implements ListView.OnItemClickListener {
+public class MainActivity extends ActionBarActivity implements ListView.OnItemClickListener {
 
     private VideoOverlay overlay;
-
-    SurfaceView display;
-    SlidingDrawer sd;
-    LinearLayout li;
+    RelativeLayout relativeLayout;
     String strDate;
     static String filePath;
     Helpers mHelper;
@@ -33,25 +25,25 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         mHelper = new Helpers(this);
         allReferences();
         Calendar c = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         strDate = sdf.format(c.getTime());
-        File folder = new File(Environment.getExternalStorageDirectory() + "/Recordings");
-        if (!folder.exists()) {
-            folder.mkdir();
+        if (!mHelper.folder.exists()) {
+            mHelper.folder.mkdir();
         }
         overlay = new VideoOverlay(getApplicationContext());
-        filePath = folder + "/" + "Video" + ".mp4";
+        filePath = mHelper.folder + "/" + "Video" + ".mp4";
 
         ListView list = mHelper.getListView();
-        li.addView(list);
+        relativeLayout.addView(list);
         if (Helpers.listDisplay = false) {
-            li.addView(list);
-            System.out.println("false");
+            relativeLayout.addView(list);
+
         } else if (Helpers.listDisplay = true) {
-            System.out.println("true");
+            Log.i("Video Recorder", "ListDisplayIsTrue");
         }
         list.setOnItemClickListener(this);
     }
@@ -59,13 +51,12 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         String videoName = parent.getItemAtPosition(position).toString();
-        getSelectedFromStorage(videoName);
+        getSelectedFileFromStorage(videoName);
     }
 
-    private void getSelectedFromStorage(String item) {
+    private void getSelectedFileFromStorage(String item) {
         File[] getVideos;
-        File folder = new File(Environment.getExternalStorageDirectory() + "/Recordings");
-        getVideos = folder.listFiles();
+        getVideos = mHelper.folder.listFiles();
         for (File file : getVideos) {
             if (file.getName().equals(item)) {
                 String filename = file.getAbsolutePath();
@@ -78,8 +69,7 @@ public class MainActivity extends Activity implements ListView.OnItemClickListen
     }
 
     private void allReferences() {
-        sd = (SlidingDrawer) findViewById(R.id.slidingDrawer);
-        li = (LinearLayout) findViewById(R.id.content);
+        relativeLayout = (RelativeLayout) findViewById(R.id.mainLayout);
     }
 
 //    private void startPlayback() {
