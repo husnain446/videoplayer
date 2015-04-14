@@ -19,7 +19,7 @@ public class VideoPlayer extends Activity implements SurfaceHolder.Callback,
     private MediaPlayer mMediaPlayer = null;
     private VideoOverlay mVideoOverlay = null;
     private String videoPath = null;
-    Helpers helpers = null;
+    private Helpers mHelpers = null;
 
     private static class Screen {
         static class Brightness {
@@ -56,8 +56,8 @@ public class VideoPlayer extends Activity implements SurfaceHolder.Callback,
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        helpers = new Helpers(getApplicationContext());
-        helpers.prepareMediaPlayer(mMediaPlayer, uri, holder);
+        mHelpers = new Helpers(getApplicationContext());
+        mHelpers.prepareMediaPlayer(mMediaPlayer, uri, holder);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class VideoPlayer extends Activity implements SurfaceHolder.Callback,
 
     @Override
     public void onClick(View v) {
-        helpers.togglePlayback(mMediaPlayer);
+        mHelpers.togglePlayback(mMediaPlayer);
     }
 
     private void setScreenBrightness(float value) {
