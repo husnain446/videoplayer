@@ -28,6 +28,7 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
     private View mVideoOverlayLayout;
     private Helpers mHelpers = null;
     VideoOverlay videoOverlay;
+    Button close;
 
 
     public VideoOverlay(Context context) {
@@ -39,7 +40,7 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
         SurfaceHolder holder = surfaceView.getHolder();
         holder.addCallback(this);
         surfaceView.setOnTouchListener(this);
-        Button close = (Button) mVideoOverlayLayout.findViewById(R.id.bClose);
+        close = (Button) mVideoOverlayLayout.findViewById(R.id.bClose);
         close.setOnClickListener(this);
         videoOverlay = this;
 
@@ -115,6 +116,7 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
             case MotionEvent.ACTION_UP:
                 if (clicked) {
                     mHelpers.togglePlayback(mediaPlayer);
+                    toggleCloseButtonVisibility();
                 }
                 return true;
         }
@@ -149,6 +151,14 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
             case R.id.bClose:
                 mediaPlayer.stop();
                 mHelpers.destroyVideoSurface(mWindowManager, mVideoOverlayLayout);
+        }
+    }
+
+    private void toggleCloseButtonVisibility() {
+        if (mediaPlayer.isPlaying()) {
+            close.setVisibility(View.INVISIBLE);
+        } else {
+            close.setVisibility(View.VISIBLE);
         }
     }
 }
