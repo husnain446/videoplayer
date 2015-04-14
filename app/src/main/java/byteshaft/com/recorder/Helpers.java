@@ -20,13 +20,8 @@ import java.util.ArrayList;
 
 public class Helpers extends ContextWrapper {
 
-    File[] getVideos;
-    ArrayAdapter<String> modeAdapter;
-    String[] realVideos;
     static boolean listDisplay = false;
-    ListView list;
     File folder = new File(Environment.getExternalStorageDirectory() + "/DCIM/Camera/");
-
 
     public Helpers(Context base) {
         super(base);
@@ -44,7 +39,6 @@ public class Helpers extends ContextWrapper {
 
     boolean isVideoPortrait(MediaPlayer mp) {
         return mp.getVideoHeight() > mp.getVideoWidth();
-
     }
 
     int getHorizontalCenterOfView(View v) {
@@ -77,45 +71,35 @@ public class Helpers extends ContextWrapper {
         }
     }
 
-    void playVideo(MediaPlayer mediaPlayer, Uri uri, SurfaceHolder holder) {
-
-        if (mediaPlayer.isPlaying()) {
-            mediaPlayer.reset();
+    void prepareMediaPlayer(MediaPlayer mp, Uri videoUri, SurfaceHolder holder) {
+        if (mp.isPlaying()) {
+            mp.reset();
         }
-
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mediaPlayer.setDisplay(holder);
-
+        mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        mp.setDisplay(holder);
         try {
-            mediaPlayer.setDataSource(getApplicationContext(), uri);
-            mediaPlayer.prepare();
-        } catch (IllegalArgumentException | IllegalStateException | IOException e) {
+            mp.setDataSource(getApplicationContext(), videoUri);
+            mp.prepare();
+        } catch (IllegalStateException | IOException e) {
             e.printStackTrace();
         }
-
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        mediaPlayer.start();
-
     }
 
     ListView getListView() {
-        list = new ListView(this);
+        ListView list = new ListView(this);
         listDisplay = true;
         ArrayList<String> videos = getVideosFileFromFolder();
-        realVideos = new String[videos.size()];
+        String[] realVideos = new String[videos.size()];
         realVideos = videos.toArray(realVideos);
-        modeAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, realVideos);
+        ArrayAdapter<String> modeAdapter = new ArrayAdapter<>(
+                getApplicationContext(), android.R.layout.simple_list_item_1, realVideos);
         list.setAdapter(modeAdapter);
         return list;
     }
 
     ArrayList<String> getVideosFileFromFolder() {
         ArrayList<String> data = new ArrayList<>();
-        getVideos = folder.listFiles();
+        File[] getVideos = folder.listFiles();
         for (File file : getVideos) {
             data.add(file.getName());
         }

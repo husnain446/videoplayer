@@ -5,7 +5,6 @@ import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -13,20 +12,13 @@ import android.view.WindowManager;
 
 
 public class VideoPlayer extends Activity implements SurfaceHolder.Callback,
-        MediaPlayer.OnCompletionListener, SurfaceView.OnLongClickListener {
+        MediaPlayer.OnCompletionListener, SurfaceView.OnLongClickListener,
+        MediaPlayer.OnPreparedListener {
 
-    Helpers mHelper = null;
     private Uri uri = null;
     private MediaPlayer mMediaPlayer = null;
     private VideoOverlay mVideoOverlay = null;
     private String videoPath = null;
-
-    private static class Screen {
-        static class Brightness {
-            static final float HIGH = 1f;
-            static final float DEFAULT = -1f;
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +30,7 @@ public class VideoPlayer extends Activity implements SurfaceHolder.Callback,
         uri = Uri.parse(videoPath);
         mMediaPlayer = new MediaPlayer();
         mMediaPlayer.setOnCompletionListener(this);
+        mMediaPlayer.setOnPreparedListener(this);
         SurfaceView mSurfaceView = (SurfaceView) findViewById(R.id.display);
         mSurfaceView.setOnLongClickListener(this);
         SurfaceHolder surfaceHolder = mSurfaceView.getHolder();
@@ -48,8 +41,8 @@ public class VideoPlayer extends Activity implements SurfaceHolder.Callback,
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        mHelper = new Helpers(getApplicationContext());
-        mHelper.playVideo(mMediaPlayer, uri, holder);
+        Helpers helpers = new Helpers(getApplicationContext());
+        helpers.prepareMediaPlayer(mMediaPlayer, uri, holder);
 
     }
 
@@ -64,8 +57,12 @@ public class VideoPlayer extends Activity implements SurfaceHolder.Callback,
     }
 
     @Override
-    public void onCompletion(MediaPlayer mp) {
+    public void onPrepared(MediaPlayer mp) {
+        mp.start();
+    }
 
+    @Override
+    public void onCompletion(MediaPlayer mp) {
         finish();
     }
 
@@ -82,5 +79,12 @@ public class VideoPlayer extends Activity implements SurfaceHolder.Callback,
         WindowManager.LayoutParams layoutParams = getWindow().getAttributes();
         layoutParams.screenBrightness = value;
         getWindow().setAttributes(layoutParams);
+    }
+
+    private static class Screen {
+        static class Brightness {
+            static final float HIGH = 1f;
+            static final float DEFAULT = -1f;
+        }
     }
 }
