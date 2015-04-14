@@ -13,12 +13,13 @@ import android.view.WindowManager;
 
 public class VideoPlayer extends Activity implements SurfaceHolder.Callback,
         MediaPlayer.OnCompletionListener, SurfaceView.OnLongClickListener,
-        MediaPlayer.OnPreparedListener {
+        MediaPlayer.OnPreparedListener, SurfaceView.OnClickListener {
 
     private Uri uri = null;
     private MediaPlayer mMediaPlayer = null;
     private VideoOverlay mVideoOverlay = null;
     private String videoPath = null;
+    Helpers helpers = null;
 
     private static class Screen {
         static class Brightness {
@@ -40,6 +41,7 @@ public class VideoPlayer extends Activity implements SurfaceHolder.Callback,
         mMediaPlayer.setOnPreparedListener(this);
         SurfaceView mSurfaceView = (SurfaceView) findViewById(R.id.display);
         mSurfaceView.setOnLongClickListener(this);
+        mSurfaceView.setOnClickListener(this);
         SurfaceHolder surfaceHolder = mSurfaceView.getHolder();
         surfaceHolder.addCallback(this);
         mVideoOverlay = new VideoOverlay(getApplicationContext());
@@ -54,9 +56,8 @@ public class VideoPlayer extends Activity implements SurfaceHolder.Callback,
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        Helpers helpers = new Helpers(getApplicationContext());
+        helpers = new Helpers(getApplicationContext());
         helpers.prepareMediaPlayer(mMediaPlayer, uri, holder);
-
     }
 
     @Override
@@ -86,6 +87,11 @@ public class VideoPlayer extends Activity implements SurfaceHolder.Callback,
         mVideoOverlay.setVideoStartPosition(mMediaPlayer.getCurrentPosition());
         mVideoOverlay.startPlayback();
         return false;
+    }
+
+    @Override
+    public void onClick(View v) {
+        helpers.togglePlayback(mMediaPlayer);
     }
 
     private void setScreenBrightness(float value) {
