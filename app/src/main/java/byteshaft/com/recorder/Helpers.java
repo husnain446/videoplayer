@@ -3,6 +3,8 @@ package byteshaft.com.recorder;
 
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -94,6 +96,9 @@ public class Helpers extends ContextWrapper {
         ArrayAdapter<String> modeAdapter = new ArrayAdapter<>(
                 getApplicationContext(), android.R.layout.simple_list_item_1, realVideos);
         list.setAdapter(modeAdapter);
+        ColorDrawable white = new ColorDrawable(this.getResources().getColor(R.color.sage));
+        list.setDivider(white);
+        list.setDividerHeight(1);
         return list;
     }
 
