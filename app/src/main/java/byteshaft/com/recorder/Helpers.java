@@ -3,10 +3,8 @@ package byteshaft.com.recorder;
 
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.hardware.Camera;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Environment;
 import android.util.TypedValue;
@@ -20,7 +18,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-@SuppressWarnings("deprecation")
 public class Helpers extends ContextWrapper {
 
     File[] getVideos;
@@ -28,7 +25,8 @@ public class Helpers extends ContextWrapper {
     String[] realVideos;
     static boolean listDisplay = false;
     ListView list;
-    MediaPlayer mediaPlayer;
+    File folder = new File(Environment.getExternalStorageDirectory() + "/DCIM/Camera/");
+
 
     public Helpers(Context base) {
         super(base);
@@ -96,7 +94,7 @@ public class Helpers extends ContextWrapper {
         }
 
         try {
-            Thread.sleep(1000);
+            Thread.sleep(100);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -107,7 +105,7 @@ public class Helpers extends ContextWrapper {
     ListView getListView() {
         list = new ListView(this);
         listDisplay = true;
-        ArrayList<String> videos = getVideosFromFolder();
+        ArrayList<String> videos = getVideosFileFromFolder();
         realVideos = new String[videos.size()];
         realVideos = videos.toArray(realVideos);
         modeAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, realVideos);
@@ -115,8 +113,7 @@ public class Helpers extends ContextWrapper {
         return list;
     }
 
-    ArrayList<String> getVideosFromFolder() {
-        File folder = new File(Environment.getExternalStorageDirectory() + "/Recordings");
+    ArrayList<String> getVideosFileFromFolder() {
         ArrayList<String> data = new ArrayList<>();
         getVideos = folder.listFiles();
         for (File file : getVideos) {

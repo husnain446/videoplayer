@@ -47,10 +47,12 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
     }
 
     void setVideoStartPosition(int position) {
+
         this.position = position;
     }
 
     void startPlayback() {
+
         createSystemOverlayForPreview(mVideoOverlayLayout);
     }
 
