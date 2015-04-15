@@ -3,33 +3,34 @@ package byteshaft.com.recorder;
 
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.VideoView;
 
 public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callback,
-        View.OnTouchListener, MediaPlayer.OnCompletionListener,
-        MediaPlayer.OnPreparedListener, View.OnClickListener {
+        View.OnTouchListener, MediaPlayer.OnCompletionListener, View.OnClickListener {
 
-
+    private final IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
     private WindowManager mWindowManager;
     private String fileRepo;
     private int position;
     private WindowManager.LayoutParams params;
-    private MediaPlayer mediaPlayer;
     private boolean clicked = false;
     private View mVideoOverlayLayout;
     private Helpers mHelpers = null;
-    VideoOverlay videoOverlay;
-    Button close;
+    private Button close;
+    private VideoView videoView;
+    private ScreenStateListener mScreenStateListener = null;
 
 
     public VideoOverlay(Context context) {
@@ -37,13 +38,14 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
         mHelpers = new Helpers(getApplicationContext());
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         mVideoOverlayLayout = inflater.inflate(R.layout.video_surface, null);
-        SurfaceView surfaceView = (SurfaceView) mVideoOverlayLayout.findViewById(R.id.surface);
-        SurfaceHolder holder = surfaceView.getHolder();
+        videoView = (VideoView) mVideoOverlayLayout.findViewById(R.id.videoView);
+        videoView.setOnCompletionListener(this);
+        mScreenStateListener = new ScreenStateListener(videoView);
+        SurfaceHolder holder = videoView.getHolder();
         holder.addCallback(this);
-        surfaceView.setOnTouchListener(this);
+        videoView.setOnTouchListener(this);
         close = (Button) mVideoOverlayLayout.findViewById(R.id.bClose);
         close.setOnClickListener(this);
-        videoOverlay = this;
 
     }
 
@@ -52,22 +54,19 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
     }
 
     void setVideoStartPosition(int position) {
-
         this.position = position;
     }
 
     void startPlayback() {
-
         createSystemOverlayForPreview(mVideoOverlayLayout);
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        Uri uri1 = Uri.parse(fileRepo);
-        mediaPlayer = mHelpers.getMediaPlayer();
-        mediaPlayer.setOnCompletionListener(this);
-        mediaPlayer.setOnPreparedListener(this);
-        mHelpers.prepareMediaPlayer(mediaPlayer, uri1, holder);
+        registerReceiver(mScreenStateListener, filter);
+        videoView.setVideoPath(fileRepo);
+        videoView.seekTo(position);
+        videoView.start();
     }
 
     @Override
@@ -77,6 +76,7 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
+        unregisterReceiver(mScreenStateListener);
 
     }
 
@@ -87,11 +87,22 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
     }
 
     private WindowManager.LayoutParams getCustomWindowManagerParameters() {
-        final int DESIRED_HEIGHT = mHelpers.getDensityPixels(100);
-        final int DESIRED_WIDTH = (int) Math.round(DESIRED_HEIGHT * 1.77);
+        Bitmap mVideoMetadata = mHelpers.getMetadataForVideo(fileRepo);
+        long height;
+        long width;
+        double ratio;
+        if (mHelpers.isVideoPortrait(mVideoMetadata)) {
+            width = mHelpers.getDensityPixels(150);
+            ratio = mHelpers.getVideoHeight(mVideoMetadata) / mHelpers.getVideoWidth(mVideoMetadata);
+            height = mHelpers.getInt(width * ratio);
+        } else {
+            height = mHelpers.getDensityPixels(150);
+            ratio = mHelpers.getVideoWidth(mVideoMetadata) / mHelpers.getVideoHeight(mVideoMetadata);
+            width = mHelpers.getInt(height * ratio);
+        }
         WindowManager.LayoutParams params = new WindowManager.LayoutParams();
-        params.height = DESIRED_HEIGHT;
-        params.width = DESIRED_WIDTH;
+        params.height = (int) height;
+        params.width = (int) width;
         params.type = WindowManager.LayoutParams.TYPE_PHONE;
         params.flags = WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS |
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
@@ -116,7 +127,7 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
                 return true;
             case MotionEvent.ACTION_UP:
                 if (clicked) {
-                    mHelpers.togglePlayback(mediaPlayer);
+                    mHelpers.togglePlayback(videoView);
                     toggleCloseButtonVisibility();
                 }
                 return true;
@@ -130,33 +141,16 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
     }
 
     @Override
-    public void onPrepared(MediaPlayer mp) {
-        float ratio;
-        if (mHelpers.isVideoPortrait(mp)) {
-            int ourWidth = mHelpers.getDensityPixels(100);
-            ratio = mp.getVideoHeight() / mp.getVideoWidth();
-            params.width = ourWidth;
-            params.height = mHelpers.getInt(ourWidth * ratio);
-        } else {
-            int ourHeight = mHelpers.getDensityPixels(100);
-            ratio = mp.getVideoWidth() / mp.getVideoHeight();
-            params.height = ourHeight;
-            params.width = mHelpers.getInt(ourHeight * ratio);
-        }
-        mp.seekTo(position);
-        mp.start();
-    }
-    @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.bClose:
-                mediaPlayer.stop();
+                videoView.stopPlayback();
                 mHelpers.destroyVideoSurface(mWindowManager, mVideoOverlayLayout);
         }
     }
 
     private void toggleCloseButtonVisibility() {
-        if (mediaPlayer.isPlaying()) {
+        if (videoView.isPlaying()) {
             close.setVisibility(View.INVISIBLE);
         } else {
             close.setVisibility(View.VISIBLE);
