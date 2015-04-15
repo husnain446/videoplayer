@@ -23,7 +23,7 @@ public class Helpers extends ContextWrapper {
 
     static boolean listDisplay = false;
     File folder = new File(Environment.getExternalStorageDirectory()
-            + "/WhatsApp/Media/WhatsApp Video");
+            + "/DCIM/Camera/");
 
     public Helpers(Context base) {
         super(base);
