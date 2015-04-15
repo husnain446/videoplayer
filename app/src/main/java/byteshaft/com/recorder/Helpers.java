@@ -3,12 +3,17 @@ package byteshaft.com.recorder;
 
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
+import android.provider.MediaStore;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.VideoView;
+
+import java.io.File;
+import java.util.ArrayList;
 
 
 public class Helpers extends ContextWrapper {
@@ -74,5 +79,27 @@ public class Helpers extends ContextWrapper {
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(file);
         return retriever.getFrameAtTime();
+    }
+
+    ArrayList<String> getAllVideos() {
+        ArrayList<String> videosList = new ArrayList<>();
+        String[] Projection = {MediaStore.Video.Media._ID, MediaStore.Images.Media.DATA};
+        Cursor cursor =  getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                Projection, null, null, null);
+        int pathColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        while (cursor.moveToNext()) {
+            videosList.add(cursor.getString(pathColumn));
+        }
+        return videosList;
+    }
+
+    String[] getVideoTitles(ArrayList<String> videos) {
+        ArrayList<String> vids = new ArrayList<>();
+        for (String video : videos) {
+            File file = new File(video);
+            vids.add(file.getName());
+        }
+        String[] realVideos = new String[vids.size()];
+        return vids.toArray(realVideos);
     }
 }
