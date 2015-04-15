@@ -5,13 +5,9 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
-import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Environment;
 import android.util.TypedValue;
-import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
@@ -19,7 +15,6 @@ import android.widget.ListView;
 import android.widget.VideoView;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class Helpers extends ContextWrapper {
@@ -59,10 +54,6 @@ public class Helpers extends ContextWrapper {
         return v.getHeight() / 2;
     }
 
-    MediaPlayer getMediaPlayer() {
-        return new MediaPlayer();
-    }
-
     WindowManager getWindowManager() {
         return (WindowManager) getSystemService(Context.WINDOW_SERVICE);
     }
@@ -78,20 +69,6 @@ public class Helpers extends ContextWrapper {
     void destroyVideoSurface(WindowManager mWindowManager, View view) {
         if (mWindowManager != null) {
             mWindowManager.removeView(view);
-        }
-    }
-
-    void prepareMediaPlayer(MediaPlayer mp, Uri videoUri, SurfaceHolder holder) {
-        if (mp.isPlaying()) {
-            mp.reset();
-        }
-        mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mp.setDisplay(holder);
-        try {
-            mp.setDataSource(getApplicationContext(), videoUri);
-            mp.prepare();
-        } catch (IllegalStateException | IOException e) {
-            e.printStackTrace();
         }
     }
 
