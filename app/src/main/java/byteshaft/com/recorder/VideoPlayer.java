@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -12,21 +11,13 @@ import android.widget.VideoView;
 
 
 public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionListener,
-         VideoView.OnTouchListener, Button.OnClickListener {
+        Button.OnClickListener {
 
     private VideoOverlay mVideoOverlay = null;
     private String videoPath = null;
     private VideoView videoView = null;
+    android.widget.MediaController controller;
 
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        if (videoView.isPlaying()) {
-            videoView.pause();
-        } else {
-            videoView.start();
-        }
-        return false;
-    }
 
     @Override
     public void onClick(View v) {
@@ -49,15 +40,21 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_player);
+        initialization();
+    }
+
+    private void initialization() {
         Bundle bundle = getIntent().getExtras();
         videoPath = bundle.getString("videoUri");
         videoView = (VideoView) findViewById(R.id.videoSurface);
         videoView.setOnCompletionListener(this);
-        videoView.setOnTouchListener(this);
         Button button = (Button) findViewById(R.id.overlayButton);
         button.setOnClickListener(this);
         mVideoOverlay = new VideoOverlay(getApplicationContext());
         setScreenBrightness(Screen.Brightness.HIGH);
+        controller = new android.widget.MediaController(this);
+        videoView.setMediaController(controller);
+        controller.setAnchorView(findViewById(R.id.videoSurface));
         videoView.setVideoPath(videoPath);
         videoView.start();
     }
