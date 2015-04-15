@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Recorder</string>
+    <string name="app_name">Video Player</string>
     <string name="title_activity_video_player">VideoPlayer</string>
     <string name="title_activity_video">VideoActivity</string>
 </resources>
