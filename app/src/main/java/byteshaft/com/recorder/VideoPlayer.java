@@ -2,14 +2,8 @@ package byteshaft.com.recorder;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
-import android.media.session.MediaController;
-import android.net.Uri;
 import android.os.Bundle;
-import android.view.MotionEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -77,6 +71,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         WindowManager.LayoutParams layoutParams = getWindow().getAttributes();
         layoutParams.screenBrightness = value;
         getWindow().setAttributes(layoutParams);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     private void showDesktop() {
@@ -85,8 +80,4 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(startMain);
     }
-
-
-
-
 }
