@@ -16,7 +16,8 @@ import android.view.WindowManager;
 import android.widget.Button;
 
 public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callback,
-        View.OnTouchListener, MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener, View.OnClickListener {
+        View.OnTouchListener, MediaPlayer.OnCompletionListener,
+        MediaPlayer.OnPreparedListener, View.OnClickListener {
 
 
     private WindowManager mWindowManager;
