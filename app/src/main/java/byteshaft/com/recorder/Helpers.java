@@ -3,7 +3,6 @@ package byteshaft.com.recorder;
 
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -23,7 +22,8 @@ import java.util.ArrayList;
 public class Helpers extends ContextWrapper {
 
     static boolean listDisplay = false;
-    File folder = new File(Environment.getExternalStorageDirectory() + "/WhatsApp/Media/WhatsApp Video");
+    File folder = new File(Environment.getExternalStorageDirectory()
+            + "/WhatsApp/Media/WhatsApp Video");
 
     public Helpers(Context base) {
         super(base);
