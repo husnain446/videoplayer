@@ -4,7 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    android:background="#666666"
-    >
+    android:background="#666666">
+    <!--<SeekBar-->
+        <!--android:id="@+id/seekBar"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:max="100"-->
+        <!--android:progress="1"/>-->
 
   </RelativeLayout>
