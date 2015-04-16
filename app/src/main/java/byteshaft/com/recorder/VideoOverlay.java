@@ -46,7 +46,6 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
         videoView.setOnTouchListener(this);
         close = (Button) mVideoOverlayLayout.findViewById(R.id.bClose);
         close.setOnClickListener(this);
-
     }
 
     void setVideoFile(String file) {

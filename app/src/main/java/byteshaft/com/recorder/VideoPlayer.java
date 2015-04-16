@@ -17,13 +17,49 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     private VideoOverlay mVideoOverlay = null;
     private String videoPath = null;
     private VideoView videoView = null;
+    private double preValue = 0;
+    private float brightness = 1;
+    private boolean clicked = false;
+
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        if (videoView.isPlaying()) {
-            videoView.pause();
-        } else {
-            videoView.start();
+        if (event.getX() < v.getWidth() / 3) {
+           switch (event.getAction()) {
+               case MotionEvent.ACTION_DOWN:
+                   preValue = event.getY();
+                   clicked = true;
+                   return true;
+               case MotionEvent.ACTION_MOVE:
+                   int result = v.getHeight() / 100;
+                   if (event.getY() > preValue + result) {
+                       System.out.println("Going UP");
+                       if (brightness > 0) {
+                           brightness-=0.10;
+                           setScreenBrightness(brightness);
+                           preValue = event.getY();
+                       }
+
+                    } else if (event.getY() < preValue + result) {
+                        System.out.println("Going DOWN");
+                        if (brightness < 1) {
+                          brightness+=0.10;
+                          setScreenBrightness(brightness);
+                          preValue = event.getY();
+                        }
+                    }
+                    clicked = false;
+                    return true;
+               case MotionEvent.ACTION_UP:
+                   if (clicked) {
+                       if (videoView.isPlaying()) {
+                           videoView.pause();
+                       } else {
+                           videoView.start();
+                       }
+                   }
+                   return true;
+            }
         }
         return false;
     }
@@ -57,6 +93,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         Button button = (Button) findViewById(R.id.overlayButton);
         button.setOnClickListener(this);
         mVideoOverlay = new VideoOverlay(getApplicationContext());
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setScreenBrightness(Screen.Brightness.HIGH);
         videoView.setVideoPath(videoPath);
         videoView.start();
@@ -76,9 +113,9 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
 
     private void setScreenBrightness(float value) {
         WindowManager.LayoutParams layoutParams = getWindow().getAttributes();
+        System.out.println(value);
         layoutParams.screenBrightness = value;
         getWindow().setAttributes(layoutParams);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     private void showDesktop() {
