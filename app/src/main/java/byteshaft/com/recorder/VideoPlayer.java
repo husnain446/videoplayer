@@ -17,8 +17,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     private VideoOverlay mVideoOverlay = null;
     private String videoPath = null;
     private VideoView videoView = null;
-    private double preValue = 0;
-    private float brightness = 1;
+    private float preValue = 0;
     private boolean clicked = false;
 
     private static class Screen {
@@ -36,30 +35,30 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        setScreenBrightness(Screen.Brightness.DEFAULT);
+        videoView.stopPlayback();
+    }
+
+    @Override
     public boolean onTouch(View v, MotionEvent event) {
-        if (event.getX() < v.getWidth() / 3) {
+        float brightness = getCurrentBrightness();
+        if (event.getX() < v.getWidth() / 2 && event.getY() > 0) {
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     preValue = event.getY();
                     clicked = true;
                     return true;
                 case MotionEvent.ACTION_MOVE:
-                    int result = v.getHeight() / 100;
-                    if (event.getY() > preValue + result) {
-                        System.out.println("Going UP");
-                        if (brightness > 0) {
-                            brightness-=0.10;
-                            setScreenBrightness(brightness);
-                            preValue = event.getY();
-                        }
-
-                    } else if (event.getY() < preValue + result) {
+                    if (event.getRawY() > preValue) {
                         System.out.println("Going DOWN");
-                        if (brightness < 1) {
-                            brightness+=0.10;
-                            setScreenBrightness(brightness);
-                            preValue = event.getY();
-                        }
+                        brightness-=0.010;
+                        setScreenBrightness(brightness);
+                    } else {
+                        System.out.println("Going UP");
+                        brightness+=0.005;
+                        setScreenBrightness(brightness);
                     }
                     clicked = false;
                     return true;
@@ -71,6 +70,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
                             videoView.start();
                         }
                     }
+                    preValue = 0;
                     return true;
             }
         }
@@ -85,13 +85,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         mVideoOverlay.startPlayback();
         finish();
         showDesktop();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        setScreenBrightness(Screen.Brightness.DEFAULT);
-        videoView.stopPlayback();
     }
 
     @Override
@@ -118,8 +111,11 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     }
 
     private void setScreenBrightness(float value) {
+        System.out.println(String.format("Attempted value %f", value));
+        if (value <= 0.010 || value > 1) {
+            return;
+        }
         WindowManager.LayoutParams layoutParams = getWindow().getAttributes();
-        System.out.println(value);
         layoutParams.screenBrightness = value;
         getWindow().setAttributes(layoutParams);
     }
@@ -129,5 +125,9 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         startMain.addCategory(Intent.CATEGORY_HOME);
         startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(startMain);
+    }
+
+    private float getCurrentBrightness() {
+        return getWindow().getAttributes().screenBrightness;
     }
 }
