@@ -14,12 +14,9 @@ import android.widget.VideoView;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class Helpers extends ContextWrapper {
-
-    List<Bitmap> thumbnailList = new ArrayList<>();
 
     public Helpers(Context base) {
         super(base);
@@ -125,4 +122,6 @@ public class Helpers extends ContextWrapper {
         String[] realVideos = new String[vids.size()];
         return vids.toArray(realVideos);
     }
+
+
 }

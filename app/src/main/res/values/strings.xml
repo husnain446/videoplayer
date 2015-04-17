@@ -2,4 +2,10 @@
     <string name="app_name">Video Player</string>
     <string name="title_activity_video_player">VideoPlayer</string>
     <string name="title_activity_video">VideoActivity</string>
+    <string name="abc_searchView_description_search">searchview</string>
+    <string name="search_hint">hint</string>
+    <string name="title_activity_search_results">SearchResultsActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
 </resources>
