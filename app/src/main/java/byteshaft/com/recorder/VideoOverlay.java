@@ -40,10 +40,10 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
         mVideoOverlayLayout = inflater.inflate(R.layout.video_surface, null);
         videoView = (VideoView) mVideoOverlayLayout.findViewById(R.id.videoView);
         videoView.setOnCompletionListener(this);
+        videoView.setOnTouchListener(this);
         mScreenStateListener = new ScreenStateListener(videoView);
         SurfaceHolder holder = videoView.getHolder();
         holder.addCallback(this);
-        videoView.setOnTouchListener(this);
         close = (Button) mVideoOverlayLayout.findViewById(R.id.bClose);
         close.setOnClickListener(this);
     }
