@@ -5,6 +5,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -20,13 +21,15 @@ import java.util.ArrayList;
 public class MainActivity extends ActionBarActivity implements ListView.OnItemClickListener, SearchView.OnQueryTextListener {
 
     private ArrayList<String> allVideos = null;
+    ArrayAdapter<String> modeAdapter = null;
+    ListView list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.mainLayout);
-        ListView list = getListView();
+        list = getListView();
         relativeLayout.addView(list);
         list.setOnItemClickListener(this);
     }
@@ -48,7 +51,7 @@ public class MainActivity extends ActionBarActivity implements ListView.OnItemCl
         allVideos = mHelper.getAllVideos();
         String[] realVideos = mHelper.getVideoTitles(allVideos);
         ListView list = new ListView(this);
-        ArrayAdapter<String> modeAdapter = new ArrayAdapter<>(
+        modeAdapter = new ArrayAdapter<>(
                 getApplicationContext(), android.R.layout.simple_list_item_1, realVideos);
         list.setAdapter(modeAdapter);
         ColorDrawable white = new ColorDrawable(this.getResources().getColor(R.color.sage));
@@ -73,7 +76,6 @@ public class MainActivity extends ActionBarActivity implements ListView.OnItemCl
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.search:
-                System.out.println("search item");
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -81,13 +83,17 @@ public class MainActivity extends ActionBarActivity implements ListView.OnItemCl
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-        System.out.println("Text submit");
         return false;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        System.out.println("On text Change");
-        return false;
+        if (TextUtils.isEmpty(newText)) {
+            modeAdapter.getFilter().filter("");
+            list.clearTextFilter();
+        } else {
+            modeAdapter.getFilter().filter(newText);
+        }
+        return true;
     }
 }
