@@ -11,7 +11,6 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.VideoView;
-
 import java.io.File;
 import java.util.ArrayList;
 
@@ -90,6 +89,7 @@ public class Helpers extends ContextWrapper {
         while (cursor.moveToNext()) {
             videosList.add(cursor.getString(pathColumn));
         }
+        cursor.close();
         return videosList;
     }
 
