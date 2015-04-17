@@ -1,33 +1,45 @@
 package byteshaft.com.recorder;
 
+import android.app.ListActivity;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
-import android.widget.AdapterView;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class MainActivity extends ActionBarActivity implements ListView.OnItemClickListener {
+public class MainActivity extends ListActivity {
 
     private ArrayList<String> allVideos = null;
+    private String[] realVideos = null;
+    private ArrayList<Bitmap> thumbnails = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.mainLayout);
-        ListView list = getListView();
-        relativeLayout.addView(list);
-        list.setOnItemClickListener(this);
+        Helpers mHelper = new Helpers(getApplicationContext());
+        allVideos = mHelper.getAllVideosUri();
+        realVideos = mHelper.getVideoTitles(allVideos);
+        thumbnails = mHelper.getAllVideosThumbnails();
+        setListAdapter(new ThumbnailAdapter(MainActivity.this, R.layout.row, realVideos));
+        ColorDrawable white = new ColorDrawable(this.getResources().getColor(R.color.sage));
+        getListView().setDivider(white);
+        getListView().setDividerHeight(1);
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
         String videoName = allVideos.get(position);
         playVideoForLocation(videoName);
     }
@@ -38,17 +50,25 @@ public class MainActivity extends ActionBarActivity implements ListView.OnItemCl
         startActivity(intent);
     }
 
-    ListView getListView() {
-        Helpers mHelper = new Helpers(getApplicationContext());
-        allVideos = mHelper.getAllVideos();
-        String[] realVideos = mHelper.getVideoTitles(allVideos);
-        ListView list = new ListView(this);
-        ArrayAdapter<String> modeAdapter = new ArrayAdapter<>(
-                getApplicationContext(), android.R.layout.simple_list_item_1, realVideos);
-        list.setAdapter(modeAdapter);
-        ColorDrawable white = new ColorDrawable(this.getResources().getColor(R.color.sage));
-        list.setDivider(white);
-        list.setDividerHeight(1);
-        return list;
+    class ThumbnailAdapter extends ArrayAdapter<String> {
+
+        public ThumbnailAdapter(Context context, int resource, String[] videos) {
+            super(context, resource, videos);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View row = convertView;
+            if (row == null) {
+                LayoutInflater inflater = getLayoutInflater();
+                row = inflater.inflate(R.layout.row, parent, false);
+            }
+
+            TextView textfilePath = (TextView) row.findViewById(R.id.FilePath);
+            textfilePath.setText(realVideos[position]);
+            ImageView imageThumbnail = (ImageView) row.findViewById(R.id.Thumbnail);
+            imageThumbnail.setImageBitmap(thumbnails.get(position));
+            return row;
+        }
     }
 }
