@@ -3,16 +3,21 @@ package byteshaft.com.recorder;
 import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.SearchView;
 
 import java.util.ArrayList;
 
-public class MainActivity extends ActionBarActivity implements ListView.OnItemClickListener {
+public class MainActivity extends ActionBarActivity implements ListView.OnItemClickListener, SearchView.OnQueryTextListener {
 
     private ArrayList<String> allVideos = null;
 
@@ -50,5 +55,39 @@ public class MainActivity extends ActionBarActivity implements ListView.OnItemCl
         list.setDivider(white);
         list.setDividerHeight(1);
         return list;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        MenuItem searchItem = menu.findItem(R.id.search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        if (searchView != null) {
+            searchView.setOnQueryTextListener(this);
+        }
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.search:
+                System.out.println("search item");
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        System.out.println("Text submit");
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        System.out.println("On text Change");
+        return false;
     }
 }
