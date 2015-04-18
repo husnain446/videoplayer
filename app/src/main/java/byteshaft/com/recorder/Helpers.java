@@ -40,14 +40,6 @@ public class Helpers extends ContextWrapper {
         return videoHeight > videoWidth;
     }
 
-    int getHorizontalCenterOfView(View v) {
-        return v.getWidth() / 2;
-    }
-
-    int getVerticalCenterOfView(View v) {
-        return v.getHeight() / 2;
-    }
-
     WindowManager getWindowManager() {
         return (WindowManager) getSystemService(Context.WINDOW_SERVICE);
     }
