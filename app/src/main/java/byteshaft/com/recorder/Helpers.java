@@ -114,6 +114,4 @@ public class Helpers extends ContextWrapper {
         String[] realVideos = new String[vids.size()];
         return vids.toArray(realVideos);
     }
-
-
 }

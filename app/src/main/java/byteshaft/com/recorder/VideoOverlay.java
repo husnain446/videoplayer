@@ -2,7 +2,6 @@ package byteshaft.com.recorder;
 
 
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
@@ -32,6 +31,8 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
     private ScreenStateListener mScreenStateListener = null;
     private double initialX = 0;
     private double initialY = 0;
+    private double initialTouchX = 0;
+    private double initialTouchY = 0;
 
 
     public VideoOverlay(Context context) {
@@ -114,13 +115,15 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
     public boolean onTouch(View v, MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                initialX = event.getX();
-                initialY = event.getY();
+                initialTouchX = event.getRawX();
+                initialTouchY = event.getRawY();
+                initialX = params.x;
+                initialY = params.y;
                 clicked = true;
                 return true;
             case MotionEvent.ACTION_MOVE:
-                params.x = (int) (event.getRawX() - initialX);
-                params.y = (int) (event.getRawY() - initialY);
+                params.x = (int) initialX + (int) (event.getRawX() - initialTouchX);
+                params.y = (int) initialY + (int) (event.getRawY() - initialTouchY);
                 mWindowManager.updateViewLayout(mVideoOverlayLayout, params);
                 clicked = false;
                 return true;
