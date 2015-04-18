@@ -21,6 +21,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     private float preValue = 0;
     private boolean clicked = false;
     private static boolean isLandscape = true;
+
     private static class Screen {
         static class Brightness {
             static final float HIGH = 1f;
@@ -32,7 +33,19 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_player);
-        initialization();
+        Bundle bundle = getIntent().getExtras();
+        videoPath = bundle.getString("videoUri");
+        videoView = (VideoView) findViewById(R.id.videoSurface);
+        videoView.setOnCompletionListener(this);
+        videoView.setOnTouchListener(this);
+        mVideoOverlay = new VideoOverlay(getApplicationContext());
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        setScreenBrightness(Screen.Brightness.HIGH);
+        android.widget.MediaController controller = new android.widget.MediaController(this);
+        videoView.setMediaController(controller);
+        controller.setAnchorView(findViewById(R.id.videoSurface));
+        videoView.setVideoPath(videoPath);
+        videoView.start();
     }
 
     @Override
@@ -65,13 +78,8 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
                     return true;
                 case MotionEvent.ACTION_UP:
                     if (clicked) {
-                        if (videoView.isPlaying()) {
-                            videoView.pause();
-                        } else {
-                            videoView.start();
-                        }
+                        togglePlayback();
                     }
-                    preValue = 0;
                     return true;
             }
         }
@@ -90,14 +98,12 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
                 showDesktop();
                 break;
             case R.id.bRotate:
-                System.out.println(isLandscape);
                 if (isLandscape) {
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-                    isLandscape = false;
-
+                    isLandscape = !isLandscape;
                 } else {
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-                    isLandscape = true;
+                    isLandscape = !isLandscape;
                 }
         }
     }
@@ -105,26 +111,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     @Override
     public void onCompletion(MediaPlayer mp) {
         finish();
-    }
-
-    private void initialization() {
-        Bundle bundle = getIntent().getExtras();
-        videoPath = bundle.getString("videoUri");
-        videoView = (VideoView) findViewById(R.id.videoSurface);
-        videoView.setOnCompletionListener(this);
-        videoView.setOnTouchListener(this);
-        Button button = (Button) findViewById(R.id.overlayButton);
-        button.setOnClickListener(this);
-        Button  orientation = (Button) findViewById(R.id.bRotate);
-        orientation.setOnClickListener(this);
-        mVideoOverlay = new VideoOverlay(getApplicationContext());
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        setScreenBrightness(Screen.Brightness.HIGH);
-        android.widget.MediaController controller = new android.widget.MediaController(this);
-        videoView.setMediaController(controller);
-        controller.setAnchorView(findViewById(R.id.videoSurface));
-        videoView.setVideoPath(videoPath);
-        videoView.start();
     }
 
     private void setScreenBrightness(float value) {
@@ -146,5 +132,13 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
 
     private float getCurrentBrightness() {
         return getWindow().getAttributes().screenBrightness;
+    }
+
+    private void togglePlayback() {
+        if (videoView.isPlaying()) {
+            videoView.pause();
+        } else {
+            videoView.start();
+        }
     }
 }
