@@ -2,7 +2,6 @@ package byteshaft.com.recorder;
 
 
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;

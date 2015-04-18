@@ -2,6 +2,7 @@ package byteshaft.com.recorder;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -19,7 +20,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     private VideoView videoView = null;
     private float preValue = 0;
     private boolean clicked = false;
-
+    private static boolean isLandscape = true;
     private static class Screen {
         static class Brightness {
             static final float HIGH = 1f;
@@ -79,12 +80,26 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
 
     @Override
     public void onClick(View v) {
-        videoView.pause();
-        mVideoOverlay.setVideoFile(videoPath);
-        mVideoOverlay.setVideoStartPosition(videoView.getCurrentPosition());
-        mVideoOverlay.startPlayback();
-        finish();
-        showDesktop();
+        switch (v.getId()) {
+            case R.id.overlayButton:
+                videoView.pause();
+                mVideoOverlay.setVideoFile(videoPath);
+                mVideoOverlay.setVideoStartPosition(videoView.getCurrentPosition());
+                mVideoOverlay.startPlayback();
+                finish();
+                showDesktop();
+                break;
+            case R.id.bRotate:
+                System.out.println(isLandscape);
+                if (isLandscape) {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                    isLandscape = false;
+
+                } else {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+                    isLandscape = true;
+                }
+        }
     }
 
     @Override
@@ -100,6 +115,8 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         videoView.setOnTouchListener(this);
         Button button = (Button) findViewById(R.id.overlayButton);
         button.setOnClickListener(this);
+        Button  orientation = (Button) findViewById(R.id.bRotate);
+        orientation.setOnClickListener(this);
         mVideoOverlay = new VideoOverlay(getApplicationContext());
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setScreenBrightness(Screen.Brightness.HIGH);
