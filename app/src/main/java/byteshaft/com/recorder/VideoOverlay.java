@@ -30,6 +30,8 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
     private Button close;
     private VideoView videoView;
     private ScreenStateListener mScreenStateListener = null;
+    private double initialX = 0;
+    private double initialY = 0;
 
 
     public VideoOverlay(Context context) {
@@ -112,13 +114,13 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
     public boolean onTouch(View v, MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                initialX = event.getX();
+                initialY = event.getY();
                 clicked = true;
                 return true;
             case MotionEvent.ACTION_MOVE:
-                int x = getHorizontalCenterOfView(v);
-                int y = getVerticalCenterOfView(v);
-                params.x = (int) (event.getRawX() - x);
-                params.y = (int) (event.getRawY() - y);
+                params.x = (int) (event.getRawX() - initialX);
+                params.y = (int) (event.getRawY() - initialY);
                 mWindowManager.updateViewLayout(mVideoOverlayLayout, params);
                 clicked = false;
                 return true;
