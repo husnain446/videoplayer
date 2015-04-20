@@ -19,7 +19,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     private String videoPath = null;
     private VideoView videoView = null;
     private boolean clicked = false;
-    private static boolean isLandscape = true;
+    private boolean isLandscape = true;
     private float relevantMoveStep = 0;
     private float initialTouchY = 0;
 
