@@ -12,11 +12,13 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.VideoView;
 
 
 public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionListener,
         Button.OnClickListener, View.OnTouchListener, VideoControllerView.MediaPlayerControl {
+
 
     private String videoPath = null;
     private VideoView videoView = null;
@@ -45,12 +47,13 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_player);
+        RelativeLayout layout = (RelativeLayout) findViewById(R.id.videoLayout);
         videoControllerView = new VideoControllerView(this);
         Bundle bundle = getIntent().getExtras();
         videoPath = bundle.getString("videoUri");
         videoView = (VideoView) findViewById(R.id.videoSurface);
         videoView.setOnCompletionListener(this);
-        videoView.setOnTouchListener(this);
+        layout.setOnTouchListener(this);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setScreenBrightness(Screen.Brightness.HIGH);
         videoControllerView.setMediaPlayer(this);
