@@ -65,9 +65,9 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        final double BRIGHTNESS_STEP = 0.075;
+        final double BRIGHTNESS_STEP = 0.066;
         final int VOLUME_STEP = 1;
-        final int ACTIVITY_HEIGHT_FRAGMENT = v.getHeight() / 15;
+        final int ACTIVITY_HEIGHT_FRAGMENT = v.getHeight() / 50;
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -87,7 +87,8 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
                         if (touchY >= relevantMoveStep) {
                             brightness-= BRIGHTNESS_STEP;
                             setScreenBrightness(brightness);
-                            relevantMoveStep += ACTIVITY_HEIGHT_FRAGMENT;
+                            initialTouchY = event.getY();
+//                            relevantMoveStep += ACTIVITY_HEIGHT_FRAGMENT;
                         }
                     } else if (touchY < initialTouchY &&
                             brightness + BRIGHTNESS_STEP <= Screen.Brightness.HIGH) {
@@ -96,7 +97,8 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
                         if (touchY <= relevantMoveStep) {
                             brightness += BRIGHTNESS_STEP;
                             setScreenBrightness(brightness);
-                            relevantMoveStep -= ACTIVITY_HEIGHT_FRAGMENT;
+                            initialTouchY = event.getY();
+//                            relevantMoveStep -= ACTIVITY_HEIGHT_FRAGMENT;
                         }
                     }
                 } else {
@@ -107,7 +109,8 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
                         if (touchY >= relevantMoveStep) {
                             volume -= VOLUME_STEP;
                             setVolume(volume);
-                            relevantMoveStep += ACTIVITY_HEIGHT_FRAGMENT;
+                            initialTouchY = event.getY();
+//                            relevantMoveStep += ACTIVITY_HEIGHT_FRAGMENT;
                         }
                     } else if (touchY < initialTouchY &&
                             volume + VOLUME_STEP <= Sound.Level.MAXIMUM) {
@@ -115,7 +118,8 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
                         if (touchY <= relevantMoveStep) {
                             volume += VOLUME_STEP;
                             setVolume(volume);
-                            relevantMoveStep -= ACTIVITY_HEIGHT_FRAGMENT;
+                            initialTouchY = event.getY();
+//                            relevantMoveStep -= ACTIVITY_HEIGHT_FRAGMENT;
                         }
                     }
                 }
