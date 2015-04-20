@@ -6,6 +6,7 @@ import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -185,15 +186,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     private float getCurrentBrightness() {
         return getWindow().getAttributes().screenBrightness;
     }
-
-    private void togglePlayback() {
-        if (videoView.isPlaying()) {
-            videoView.pause();
-        } else {
-            videoView.start();
-        }
-    }
-
+    
     @Override
     public boolean canPause() {
         return true;
@@ -236,7 +229,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
 
     @Override
     public void seekTo(int i) {
-        videoView.seekTo(i);
+
     }
 
     @Override
