@@ -122,13 +122,19 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
                         }
                     }
                 }
-                clicked = false;
+                if (touchY > initialTouchY + 10) {
+                    clicked = false;
+                } else if (touchY < initialTouchY - 10) {
+                    clicked = false;
+                }
                 return true;
             case MotionEvent.ACTION_UP:
-                if (videoControllerView.isShowing()) {
-                    videoControllerView.hide();
-                } else {
-                    videoControllerView.show();
+                if (clicked) {
+                    if (videoControllerView.isShowing()) {
+                        videoControllerView.hide();
+                    } else {
+                        videoControllerView.show();
+                    }
                 }
                 return true;
         }
