@@ -10,15 +10,17 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.VideoView;
 
 
 public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionListener,
-        Button.OnClickListener, View.OnTouchListener {
+        Button.OnClickListener, View.OnTouchListener, VideoControllerView.MediaPlayerControl {
 
     private String videoPath = null;
     private VideoView videoView = null;
     private boolean clicked = false;
+    VideoControllerView videoControllerView;
     private boolean isLandscape = true;
     private float relevantMoveStep = 0;
     private float initialTouchY = 0;
@@ -42,6 +44,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_player);
+        videoControllerView = new VideoControllerView(this);
         Bundle bundle = getIntent().getExtras();
         videoPath = bundle.getString("videoUri");
         videoView = (VideoView) findViewById(R.id.videoSurface);
@@ -49,11 +52,11 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         videoView.setOnTouchListener(this);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setScreenBrightness(Screen.Brightness.HIGH);
-        android.widget.MediaController controller = new android.widget.MediaController(this);
-        videoView.setMediaController(controller);
-        controller.setAnchorView(findViewById(R.id.videoSurface));
+        videoControllerView.setMediaPlayer(this);
+        videoControllerView.setAnchorView((FrameLayout) findViewById(R.id.videoSurfaceContainer));
         videoView.setVideoPath(videoPath);
         videoView.start();
+
     }
 
     @Override
@@ -85,7 +88,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
                         System.out.println("Going DOWN");
                         relevantMoveStep = initialTouchY + ACTIVITY_HEIGHT_FRAGMENT;
                         if (touchY >= relevantMoveStep) {
-                            brightness-= BRIGHTNESS_STEP;
+                            brightness -= BRIGHTNESS_STEP;
                             setScreenBrightness(brightness);
                             initialTouchY = event.getY();
                         }
@@ -122,8 +125,10 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
                 clicked = false;
                 return true;
             case MotionEvent.ACTION_UP:
-                if (clicked) {
-                    togglePlayback();
+                if (videoControllerView.isShowing()) {
+                    videoControllerView.hide();
+                } else {
+                    videoControllerView.show();
                 }
                 return true;
         }
@@ -181,6 +186,66 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         } else {
             videoView.start();
         }
+    }
+
+    @Override
+    public boolean canPause() {
+        return true;
+    }
+
+    @Override
+    public boolean canSeekBackward() {
+        return true;
+    }
+
+    @Override
+    public boolean canSeekForward() {
+        return true;
+    }
+
+    @Override
+    public int getBufferPercentage() {
+        return 0;
+    }
+
+    @Override
+    public int getCurrentPosition() {
+        return videoView.getCurrentPosition();
+    }
+
+    @Override
+    public int getDuration() {
+        return videoView.getDuration();
+    }
+
+    @Override
+    public boolean isPlaying() {
+        return videoView.isPlaying();
+    }
+
+    @Override
+    public void pause() {
+        videoView.pause();
+    }
+
+    @Override
+    public void seekTo(int i) {
+        videoView.seekTo(i);
+    }
+
+    @Override
+    public void start() {
+        videoView.start();
+    }
+
+    @Override
+    public boolean isFullScreen() {
+        return false;
+    }
+
+    @Override
+    public void toggleFullScreen() {
+
     }
 
     private int getCurrentVolume() {
