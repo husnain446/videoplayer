@@ -6,17 +6,17 @@
     android:orientation="horizontal" >
 
     <LinearLayout
-        android:layout_width="100dp"
+        android:layout_width="106dp"
         android:layout_height="fill_parent"
         android:padding="8dp"
         android:background="@android:drawable/dialog_holo_light_frame">
 
         <ImageView
             android:id="@+id/Thumbnail"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:background="#000000"
-            android:src="@drawable/abc_ratingbar_full_material" />
+            android:src="@drawable/abc_ratingbar_full_material"/>
 
     </LinearLayout>
 
