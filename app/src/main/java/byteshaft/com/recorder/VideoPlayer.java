@@ -88,7 +88,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
                             brightness-= BRIGHTNESS_STEP;
                             setScreenBrightness(brightness);
                             initialTouchY = event.getY();
-//                            relevantMoveStep += ACTIVITY_HEIGHT_FRAGMENT;
                         }
                     } else if (touchY < initialTouchY &&
                             brightness + BRIGHTNESS_STEP <= Screen.Brightness.HIGH) {
@@ -98,7 +97,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
                             brightness += BRIGHTNESS_STEP;
                             setScreenBrightness(brightness);
                             initialTouchY = event.getY();
-//                            relevantMoveStep -= ACTIVITY_HEIGHT_FRAGMENT;
                         }
                     }
                 } else {
@@ -110,7 +108,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
                             volume -= VOLUME_STEP;
                             setVolume(volume);
                             initialTouchY = event.getY();
-//                            relevantMoveStep += ACTIVITY_HEIGHT_FRAGMENT;
                         }
                     } else if (touchY < initialTouchY &&
                             volume + VOLUME_STEP <= Sound.Level.MAXIMUM) {
@@ -119,7 +116,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
                             volume += VOLUME_STEP;
                             setVolume(volume);
                             initialTouchY = event.getY();
-//                            relevantMoveStep -= ACTIVITY_HEIGHT_FRAGMENT;
                         }
                     }
                 }
