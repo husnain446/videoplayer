@@ -9,11 +9,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.VideoView;
 
 
 public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionListener,
-        Button.OnClickListener, View.OnTouchListener {
+        Button.OnClickListener, View.OnTouchListener, VideoControllerView.MediaPlayerControl {
 
     private VideoOverlay mVideoOverlay = null;
     private String videoPath = null;
@@ -21,6 +22,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     private float preValue = 0;
     private boolean clicked = false;
     private static boolean isLandscape = true;
+    VideoControllerView videoControllerView;
 
     private static class Screen {
         static class Brightness {
@@ -33,6 +35,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_player);
+        videoControllerView = new VideoControllerView(this);
         Bundle bundle = getIntent().getExtras();
         videoPath = bundle.getString("videoUri");
         videoView = (VideoView) findViewById(R.id.videoSurface);
@@ -41,11 +44,11 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         mVideoOverlay = new VideoOverlay(getApplicationContext());
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setScreenBrightness(Screen.Brightness.HIGH);
-        android.widget.MediaController controller = new android.widget.MediaController(this);
-        videoView.setMediaController(controller);
-        controller.setAnchorView(findViewById(R.id.videoSurface));
+        videoControllerView.setMediaPlayer(this);
+        videoControllerView.setAnchorView((FrameLayout) findViewById(R.id.videoSurfaceContainer));
         videoView.setVideoPath(videoPath);
         videoView.start();
+
     }
 
     @Override
@@ -77,8 +80,10 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
                     clicked = false;
                     return true;
                 case MotionEvent.ACTION_UP:
-                    if (clicked) {
-                        togglePlayback();
+                    if (videoControllerView.isShowing()) {
+                        videoControllerView.hide();
+                    } else {
+                        videoControllerView.show();
                     }
                     return true;
             }
@@ -100,11 +105,10 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
             case R.id.bRotate:
                 if (isLandscape) {
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-                    isLandscape = !isLandscape;
                 } else {
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-                    isLandscape = !isLandscape;
                 }
+                isLandscape = !isLandscape;
         }
     }
 
@@ -141,4 +145,62 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
             videoView.start();
         }
     }
+
+    @Override
+    public boolean canPause() {
+        return true;
+    }
+
+    @Override
+    public boolean canSeekBackward() {
+        return true;
+    }
+
+    @Override
+    public boolean canSeekForward() {
+        return true;
+    }
+
+    @Override
+    public int getBufferPercentage() {
+        return 0;
+    }
+
+    @Override
+    public int getCurrentPosition() {
+        return videoView.getCurrentPosition();
+    }
+
+    @Override
+    public int getDuration() {
+        return videoView.getDuration();
+    }
+
+    @Override
+    public boolean isPlaying() {
+        return videoView.isPlaying();
+    }
+
+    @Override
+    public void pause() {
+        videoView.pause();
+    }
+
+    @Override
+    public void seekTo(int i) {
+        videoView.seekTo(i);
+    }
+
+    @Override
+    public void start() {
+        videoView.start();
+    }
+
+    @Override
+    public boolean isFullScreen() {
+        return false;
+    }
+
+    @Override
+    public void toggleFullScreen() {    }
 }
