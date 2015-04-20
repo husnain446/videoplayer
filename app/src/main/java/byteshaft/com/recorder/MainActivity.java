@@ -6,9 +6,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
+import android.media.ThumbnailUtils;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.view.MenuItemCompat;
 import android.text.TextUtils;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,8 +32,8 @@ public class MainActivity extends ListActivity implements SearchView.OnQueryText
 
     private ArrayList<String> allVideos = null;
     private String[] realVideos = null;
-    private ArrayList<Bitmap> thumbnails = null;
     private ArrayAdapter<String> modeAdapter = null;
+    private SparseArray<Bitmap> thumbnailArray = new SparseArray<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,12 +41,12 @@ public class MainActivity extends ListActivity implements SearchView.OnQueryText
         Helpers mHelper = new Helpers(getApplicationContext());
         allVideos = mHelper.getAllVideosUri();
         realVideos = mHelper.getVideoTitles(allVideos);
-        thumbnails = mHelper.getAllVideosThumbnails();
         modeAdapter = new ThumbnailAdapter(MainActivity.this, R.layout.row, realVideos);
         setListAdapter(modeAdapter);
-        ColorDrawable white = new ColorDrawable(this.getResources().getColor(R.color.sage));
-        getListView().setDivider(white);
-        getListView().setDividerHeight(1);
+        ColorDrawable color = new ColorDrawable(
+                getResources().getColor(android.R.color.holo_blue_bright));
+        getListView().setDivider(color);
+        getListView().setDividerHeight(2);
     }
 
     @Override
@@ -74,7 +78,11 @@ public class MainActivity extends ListActivity implements SearchView.OnQueryText
             TextView textfilePath = (TextView) row.findViewById(R.id.FilePath);
             textfilePath.setText(realVideos[position]);
             ImageView imageThumbnail = (ImageView) row.findViewById(R.id.Thumbnail);
-            imageThumbnail.setImageBitmap(thumbnails.get(position));
+            if (thumbnailArray.get(position, null) == null) {
+                new ThumbnailCreationTask(imageThumbnail, position).execute(allVideos.get(position));
+            } else {
+                imageThumbnail.setImageBitmap(thumbnailArray.get(position));
+            }
             return row;
         }
     }
@@ -113,5 +121,29 @@ public class MainActivity extends ListActivity implements SearchView.OnQueryText
             modeAdapter.getFilter().filter(newText);
         }
         return true;
+    }
+
+    class ThumbnailCreationTask extends AsyncTask<String, Void, Bitmap> {
+
+        private ImageView thumbnailContainer = null;
+        private int thumbId = 0;
+
+        public ThumbnailCreationTask(ImageView imageView, int position) {
+            thumbnailContainer = imageView;
+            thumbId = position;
+        }
+
+        @Override
+        protected Bitmap doInBackground(String... params) {
+            return ThumbnailUtils.createVideoThumbnail(params[0],
+                    MediaStore.Video.Thumbnails.MICRO_KIND);
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+            thumbnailArray.put(thumbId, bitmap);
+            thumbnailContainer.setImageBitmap(bitmap);
+        }
     }
 }

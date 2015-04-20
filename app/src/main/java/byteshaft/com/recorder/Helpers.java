@@ -84,21 +84,6 @@ public class Helpers extends ContextWrapper {
         return uris;
     }
 
-    ArrayList<Bitmap> getAllVideosThumbnails() {
-        ArrayList<Bitmap> thumbnails = new ArrayList<>();
-        Cursor cursor = getVideosCursor();
-        int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
-
-        while (cursor.moveToNext()) {
-            int id = cursor.getInt(idColumn);
-            Bitmap thumbnail = MediaStore.Video.Thumbnails.getThumbnail(
-                    getContentResolver(), id, MediaStore.Video.Thumbnails.MINI_KIND, null);
-            thumbnails.add(thumbnail);
-        }
-        cursor.close();
-        return thumbnails;
-    }
-
     private Cursor getVideosCursor() {
         String[] Projection = {MediaStore.Video.Media._ID, MediaStore.Images.Media.DATA};
         return getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,

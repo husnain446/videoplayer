@@ -3,6 +3,7 @@ package byteshaft.com.recorder;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -16,18 +17,26 @@ import android.widget.VideoView;
 public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionListener,
         Button.OnClickListener, View.OnTouchListener, VideoControllerView.MediaPlayerControl {
 
-    private VideoOverlay mVideoOverlay = null;
     private String videoPath = null;
     private VideoView videoView = null;
-    private float preValue = 0;
     private boolean clicked = false;
-    private static boolean isLandscape = true;
     VideoControllerView videoControllerView;
+    private boolean isLandscape = true;
+    private float relevantMoveStep = 0;
+    private float initialTouchY = 0;
 
     private static class Screen {
         static class Brightness {
             static final float HIGH = 1f;
             static final float DEFAULT = -1f;
+            static final float LOW = 0f;
+        }
+    }
+
+    private static class Sound {
+        static class Level {
+            static final int MINIMUM = 0;
+            static final int MAXIMUM = 15;
         }
     }
 
@@ -41,7 +50,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         videoView = (VideoView) findViewById(R.id.videoSurface);
         videoView.setOnCompletionListener(this);
         videoView.setOnTouchListener(this);
-        mVideoOverlay = new VideoOverlay(getApplicationContext());
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setScreenBrightness(Screen.Brightness.HIGH);
         videoControllerView.setMediaPlayer(this);
@@ -60,33 +68,69 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        float brightness = getCurrentBrightness();
-        if (event.getX() < v.getWidth() / 2 && event.getY() > 0) {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    preValue = event.getY();
-                    clicked = true;
-                    return true;
-                case MotionEvent.ACTION_MOVE:
-                    if (event.getRawY() > preValue) {
+        final double BRIGHTNESS_STEP = 0.066;
+        final int VOLUME_STEP = 1;
+        final int ACTIVITY_HEIGHT_FRAGMENT = v.getHeight() / 50;
+
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                initialTouchY = event.getY();
+                clicked = true;
+                return true;
+            case MotionEvent.ACTION_MOVE:
+                float touchX = event.getX();
+                float touchY = event.getY();
+                // If action is on the left half of the View.
+                if (touchX < v.getWidth() / 2) {
+                    float brightness = getCurrentBrightness();
+                    if (touchY > initialTouchY &&
+                            brightness - BRIGHTNESS_STEP > Screen.Brightness.LOW) {
                         System.out.println("Going DOWN");
-                        brightness-=0.010;
-                        setScreenBrightness(brightness);
-                    } else {
+                        relevantMoveStep = initialTouchY + ACTIVITY_HEIGHT_FRAGMENT;
+                        if (touchY >= relevantMoveStep) {
+                            brightness -= BRIGHTNESS_STEP;
+                            setScreenBrightness(brightness);
+                            initialTouchY = event.getY();
+                        }
+                    } else if (touchY < initialTouchY &&
+                            brightness + BRIGHTNESS_STEP <= Screen.Brightness.HIGH) {
                         System.out.println("Going UP");
-                        brightness+=0.005;
-                        setScreenBrightness(brightness);
+                        relevantMoveStep = initialTouchY - ACTIVITY_HEIGHT_FRAGMENT;
+                        if (touchY <= relevantMoveStep) {
+                            brightness += BRIGHTNESS_STEP;
+                            setScreenBrightness(brightness);
+                            initialTouchY = event.getY();
+                        }
                     }
-                    clicked = false;
-                    return true;
-                case MotionEvent.ACTION_UP:
-                    if (videoControllerView.isShowing()) {
-                        videoControllerView.hide();
-                    } else {
-                        videoControllerView.show();
+                } else {
+                    int volume = getCurrentVolume();
+                    if (touchY > initialTouchY &&
+                            volume - VOLUME_STEP >= Sound.Level.MINIMUM) {
+                        relevantMoveStep = initialTouchY + ACTIVITY_HEIGHT_FRAGMENT;
+                        if (touchY >= relevantMoveStep) {
+                            volume -= VOLUME_STEP;
+                            setVolume(volume);
+                            initialTouchY = event.getY();
+                        }
+                    } else if (touchY < initialTouchY &&
+                            volume + VOLUME_STEP <= Sound.Level.MAXIMUM) {
+                        relevantMoveStep = initialTouchY - ACTIVITY_HEIGHT_FRAGMENT;
+                        if (touchY <= relevantMoveStep) {
+                            volume += VOLUME_STEP;
+                            setVolume(volume);
+                            initialTouchY = event.getY();
+                        }
                     }
-                    return true;
-            }
+                }
+                clicked = false;
+                return true;
+            case MotionEvent.ACTION_UP:
+                if (videoControllerView.isShowing()) {
+                    videoControllerView.hide();
+                } else {
+                    videoControllerView.show();
+                }
+                return true;
         }
         return false;
     }
@@ -96,9 +140,10 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         switch (v.getId()) {
             case R.id.overlayButton:
                 videoView.pause();
-                mVideoOverlay.setVideoFile(videoPath);
-                mVideoOverlay.setVideoStartPosition(videoView.getCurrentPosition());
-                mVideoOverlay.startPlayback();
+                VideoOverlay videoOverlay = new VideoOverlay(getApplicationContext());
+                videoOverlay.setVideoFile(videoPath);
+                videoOverlay.setVideoStartPosition(videoView.getCurrentPosition());
+                videoOverlay.startPlayback();
                 finish();
                 showDesktop();
                 break;
@@ -119,9 +164,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
 
     private void setScreenBrightness(float value) {
         System.out.println(String.format("Attempted value %f", value));
-        if (value <= 0.010 || value > 1) {
-            return;
-        }
         WindowManager.LayoutParams layoutParams = getWindow().getAttributes();
         layoutParams.screenBrightness = value;
         getWindow().setAttributes(layoutParams);
@@ -202,5 +244,17 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     }
 
     @Override
-    public void toggleFullScreen() {    }
+    public void toggleFullScreen() {
+
+    }
+
+    private int getCurrentVolume() {
+        AudioManager am = (AudioManager) getSystemService(AUDIO_SERVICE);
+        return am.getStreamVolume(AudioManager.STREAM_MUSIC);
+    }
+
+    private void setVolume(int level) {
+        AudioManager am = (AudioManager) getSystemService(AUDIO_SERVICE);
+        am.setStreamVolume(AudioManager.STREAM_MUSIC, level, 0);
+    }
 }
