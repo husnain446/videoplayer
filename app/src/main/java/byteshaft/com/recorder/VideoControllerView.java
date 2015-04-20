@@ -17,6 +17,7 @@
 package byteshaft.com.recorder;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
@@ -184,6 +185,7 @@ public class VideoControllerView extends FrameLayout {
 
         mEndTime = (TextView) v.findViewById(R.id.time);
         mCurrentTime = (TextView) v.findViewById(R.id.time_current);
+        mCurrentTime.setTextColor(Color.WHITE);
         mFormatBuilder = new StringBuilder();
         mFormatter = new Formatter(mFormatBuilder, Locale.getDefault());
 
@@ -319,6 +321,7 @@ public class VideoControllerView extends FrameLayout {
 
         if (mEndTime != null)
             mEndTime.setText(stringForTime(duration));
+        mEndTime.setTextColor(Color.WHITE);
         if (mCurrentTime != null)
             mCurrentTime.setText(stringForTime(position));
 
