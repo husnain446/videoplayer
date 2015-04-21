@@ -4,11 +4,15 @@ import android.app.ListActivity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.media.ThumbnailUtils;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.view.MenuItemCompat;
 import android.text.TextUtils;
@@ -25,6 +29,10 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 
+import java.io.File;
+import java.net.URI;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 
@@ -33,20 +41,17 @@ public class MainActivity extends ListActivity implements SearchView.OnQueryText
     private ArrayList<String> allVideos = null;
     private String[] realVideos = null;
     private ArrayAdapter<String> modeAdapter = null;
-    private SparseArray<Bitmap> thumbnailArray = new SparseArray<>();
+    private Helpers mHelper = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Helpers mHelper = new Helpers(getApplicationContext());
+        mHelper = new Helpers(getApplicationContext());
         allVideos = mHelper.getAllVideosUri();
         realVideos = mHelper.getVideoTitles(allVideos);
         modeAdapter = new ThumbnailAdapter(MainActivity.this, R.layout.row, realVideos);
         setListAdapter(modeAdapter);
-        ColorDrawable color = new ColorDrawable(
-                getResources().getColor(android.R.color.holo_blue_bright));
-        getListView().setDivider(color);
-        getListView().setDividerHeight(2);
+        getListView().setDivider(null);
     }
 
     @Override
@@ -78,10 +83,15 @@ public class MainActivity extends ListActivity implements SearchView.OnQueryText
             TextView textfilePath = (TextView) row.findViewById(R.id.FilePath);
             textfilePath.setText(realVideos[position]);
             ImageView imageThumbnail = (ImageView) row.findViewById(R.id.Thumbnail);
-            if (thumbnailArray.get(position, null) == null) {
-                new ThumbnailCreationTask(imageThumbnail, position).execute(allVideos.get(position));
+            File file = new File(allVideos.get(position));
+            String name = String.valueOf(file.hashCode());
+            String filePath = getFilesDir().getAbsolutePath() + "/" + name;
+            Uri uri = Uri.parse(filePath);
+            File link = new File(uri.getPath());
+            if (link.exists()) {
+                imageThumbnail.setImageURI(uri);
             } else {
-                imageThumbnail.setImageBitmap(thumbnailArray.get(position));
+                new ThumbnailCreationTask(imageThumbnail, position).execute();
             }
             return row;
         }
@@ -123,7 +133,7 @@ public class MainActivity extends ListActivity implements SearchView.OnQueryText
         return true;
     }
 
-    class ThumbnailCreationTask extends AsyncTask<String, Void, Bitmap> {
+    class ThumbnailCreationTask extends AsyncTask<Void, Void, Bitmap> {
 
         private ImageView thumbnailContainer = null;
         private int thumbId = 0;
@@ -134,16 +144,27 @@ public class MainActivity extends ListActivity implements SearchView.OnQueryText
         }
 
         @Override
-        protected Bitmap doInBackground(String... params) {
-            return ThumbnailUtils.createVideoThumbnail(params[0],
-                    MediaStore.Video.Thumbnails.MICRO_KIND);
+        protected Bitmap doInBackground(Void... params) {
+            String[] projection = {MediaStore.Video.Media._ID};
+            Cursor cursor = getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                    projection, null, null, null);
+            int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
+            cursor.moveToPosition(thumbId);
+            int id = cursor.getInt(idColumn);
+
+            return MediaStore.Video.Thumbnails.getThumbnail(
+                    getContentResolver(), id, MediaStore.Video.Thumbnails.MICRO_KIND, null);
         }
 
         @Override
         protected void onPostExecute(Bitmap bitmap) {
             super.onPostExecute(bitmap);
-            thumbnailArray.put(thumbId, bitmap);
-            thumbnailContainer.setImageBitmap(bitmap);
+            File file = new File(allVideos.get(thumbId));
+            String name = String.valueOf(file.hashCode());
+            mHelper.writeBitmapToFile(bitmap, name);
+            String filePath = getFilesDir().getAbsolutePath() + "/" + name;
+            Uri uri = Uri.parse(filePath);
+            thumbnailContainer.setImageURI(uri);
         }
     }
 }

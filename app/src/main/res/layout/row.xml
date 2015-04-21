@@ -6,7 +6,7 @@
     android:orientation="horizontal" >
 
     <LinearLayout
-        android:layout_width="106dp"
+        android:layout_width="80dp"
         android:layout_height="fill_parent"
         android:padding="8dp"
         android:background="@android:drawable/dialog_holo_light_frame">
