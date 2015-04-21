@@ -2,27 +2,25 @@ package byteshaft.com.recorder;
 
 import android.app.ListActivity;
 import android.app.SearchManager;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.view.MenuItemCompat;
 import android.text.TextUtils;
-import android.util.SparseArray;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -30,9 +28,6 @@ import android.widget.SearchView;
 import android.widget.TextView;
 
 import java.io.File;
-import java.net.URI;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 
@@ -48,10 +43,7 @@ public class MainActivity extends ListActivity implements SearchView.OnQueryText
         super.onCreate(savedInstanceState);
         mHelper = new Helpers(getApplicationContext());
         allVideos = mHelper.getAllVideosUri();
-        realVideos = mHelper.getVideoTitles(allVideos);
-        modeAdapter = new ThumbnailAdapter(MainActivity.this, R.layout.row, realVideos);
-        setListAdapter(modeAdapter);
-        getListView().setDivider(null);
+        setupListView();
     }
 
     @Override
@@ -166,5 +158,59 @@ public class MainActivity extends ListActivity implements SearchView.OnQueryText
             Uri uri = Uri.parse(filePath);
             thumbnailContainer.setImageURI(uri);
         }
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
+        menu.setHeaderTitle(realVideos[info.position]);
+        String[] menuItems = {"Play", "Delete"};
+        for (int i = 0; i<menuItems.length; i++) {
+            menu.add(Menu.NONE, i, i, menuItems[i]);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+        int menuItemIndex = item.getItemId();
+        String[] menuItems = {"Play", "Delete"};
+        String menuItemName = menuItems[menuItemIndex];
+        String listItemName = allVideos.get(info.position);
+        if (menuItemName.equals("Play")) {
+            playVideoForLocation(listItemName);
+        } else if (menuItemName.equals("Delete")) {
+            deleteFile(info);
+            allVideos.remove(info.position);
+            setupListView();
+
+        }
+        return super.onContextItemSelected(item);
+
+    }
+
+    @Override
+    public void unregisterForContextMenu(View view) {
+        super.unregisterForContextMenu(view);
+    }
+
+    private void deleteFile(AdapterView.AdapterContextMenuInfo info) {
+        String[] projection = {MediaStore.Video.Media._ID};
+        Cursor cursor = getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                projection, null, null, null);
+        int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
+        cursor.moveToPosition(info.position);
+        int id = cursor.getInt(idColumn);
+        Uri uri = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id);
+        getContentResolver().delete(uri, null, null);
+    }
+
+    private void setupListView() {
+        realVideos = mHelper.getVideoTitles(allVideos);
+        modeAdapter = new ThumbnailAdapter(MainActivity.this, R.layout.row, realVideos);
+        setListAdapter(modeAdapter);
+        getListView().setDivider(null);
+        registerForContextMenu(getListView());
     }
 }
