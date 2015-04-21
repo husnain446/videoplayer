@@ -13,6 +13,9 @@ import android.view.WindowManager;
 import android.widget.VideoView;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 
@@ -98,5 +101,18 @@ public class Helpers extends ContextWrapper {
         }
         String[] realVideos = new String[vids.size()];
         return vids.toArray(realVideos);
+    }
+
+    void writeBitmapToFile(Bitmap bitmap, String fileName) {
+        FileOutputStream outputStream;
+        try {
+            outputStream = openFileOutput(fileName, Context.MODE_PRIVATE);
+            if (bitmap != null) {
+                bitmap.compress(Bitmap.CompressFormat.PNG, 85, outputStream);
+            }
+            outputStream.flush();
+            outputStream.close();
+        } catch (IOException ignored) {
+        }
     }
 }

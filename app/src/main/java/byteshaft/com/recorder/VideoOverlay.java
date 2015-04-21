@@ -122,10 +122,13 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
                 clicked = true;
                 return true;
             case MotionEvent.ACTION_MOVE:
-                params.x = (int) initialX + (int) (event.getRawX() - initialTouchX);
-                params.y = (int) initialY + (int) (event.getRawY() - initialTouchY);
-                mWindowManager.updateViewLayout(mVideoOverlayLayout, params);
-                clicked = false;
+                if (event.getRawX() > initialX + 10 || event.getRawX() < initialX - 10 ||
+                        event.getRawY() > initialY + 10 || event.getRawY() < initialY - 10) {
+                    params.x = (int) initialX + (int) (event.getRawX() - initialTouchX);
+                    params.y = (int) initialY + (int) (event.getRawY() - initialTouchY);
+                    mWindowManager.updateViewLayout(mVideoOverlayLayout, params);
+                    clicked = false;
+                }
                 return true;
             case MotionEvent.ACTION_UP:
                 if (clicked) {
