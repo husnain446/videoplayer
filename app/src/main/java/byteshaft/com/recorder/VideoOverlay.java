@@ -2,7 +2,6 @@ package byteshaft.com.recorder;
 
 
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
@@ -17,7 +16,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.VideoView;
 
-public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callback,
+public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
         View.OnTouchListener, MediaPlayer.OnCompletionListener, View.OnClickListener {
 
     private final IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
@@ -27,15 +26,17 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
     private WindowManager.LayoutParams params;
     private boolean clicked = false;
     private View mVideoOverlayLayout;
-    private Helpers mHelpers = null;
     private Button close;
     private VideoView videoView;
     private ScreenStateListener mScreenStateListener = null;
+    private double initialX = 0;
+    private double initialY = 0;
+    private double initialTouchX = 0;
+    private double initialTouchY = 0;
 
 
     public VideoOverlay(Context context) {
         super(context);
-        mHelpers = new Helpers(getApplicationContext());
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         mVideoOverlayLayout = inflater.inflate(R.layout.video_surface, null);
         videoView = (VideoView) mVideoOverlayLayout.findViewById(R.id.videoView);
@@ -80,24 +81,24 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
     }
 
     private void createSystemOverlayForPreview(View previewForCamera) {
-        mWindowManager = mHelpers.getWindowManager();
+        mWindowManager = getWindowManager();
         params = getCustomWindowManagerParameters();
         mWindowManager.addView(previewForCamera, params);
     }
 
     private WindowManager.LayoutParams getCustomWindowManagerParameters() {
-        Bitmap mVideoMetadata = mHelpers.getMetadataForVideo(fileRepo);
+        Bitmap mVideoMetadata = getMetadataForVideo(fileRepo);
         long height;
         long width;
         double ratio;
-        if (mHelpers.isVideoPortrait(mVideoMetadata)) {
-            width = mHelpers.getDensityPixels(150);
-            ratio = mHelpers.getVideoHeight(mVideoMetadata) / mHelpers.getVideoWidth(mVideoMetadata);
-            height = mHelpers.getInt(width * ratio);
+        if (isVideoPortrait(mVideoMetadata)) {
+            width = getDensityPixels(150);
+            ratio = getVideoHeight(mVideoMetadata) / getVideoWidth(mVideoMetadata);
+            height = getInt(width * ratio);
         } else {
-            height = mHelpers.getDensityPixels(150);
-            ratio = mHelpers.getVideoWidth(mVideoMetadata) / mHelpers.getVideoHeight(mVideoMetadata);
-            width = mHelpers.getInt(height * ratio);
+            height = getDensityPixels(150);
+            ratio = getVideoWidth(mVideoMetadata) / getVideoHeight(mVideoMetadata);
+            width = getInt(height * ratio);
         }
         WindowManager.LayoutParams params = new WindowManager.LayoutParams();
         params.height = (int) height;
@@ -114,19 +115,24 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
     public boolean onTouch(View v, MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                initialTouchX = event.getRawX();
+                initialTouchY = event.getRawY();
+                initialX = params.x;
+                initialY = params.y;
                 clicked = true;
                 return true;
             case MotionEvent.ACTION_MOVE:
-                int x = mHelpers.getHorizontalCenterOfView(v);
-                int y = mHelpers.getVerticalCenterOfView(v);
-                params.x = (int) (event.getRawX() - x);
-                params.y = (int) (event.getRawY() - y);
-                mWindowManager.updateViewLayout(mVideoOverlayLayout, params);
-                clicked = false;
+                if (event.getRawX() > initialX + 10 || event.getRawX() < initialX - 10 ||
+                        event.getRawY() > initialY + 10 || event.getRawY() < initialY - 10) {
+                    params.x = (int) initialX + (int) (event.getRawX() - initialTouchX);
+                    params.y = (int) initialY + (int) (event.getRawY() - initialTouchY);
+                    mWindowManager.updateViewLayout(mVideoOverlayLayout, params);
+                    clicked = false;
+                }
                 return true;
             case MotionEvent.ACTION_UP:
                 if (clicked) {
-                    mHelpers.togglePlayback(videoView);
+                    togglePlayback(videoView);
                     toggleCloseButtonVisibility();
                 }
                 return true;
@@ -136,7 +142,7 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        mHelpers.destroyVideoSurface(mWindowManager, mVideoOverlayLayout);
+        destroyVideoSurface(mWindowManager, mVideoOverlayLayout);
     }
 
     @Override
@@ -144,7 +150,7 @@ public class VideoOverlay extends ContextWrapper implements SurfaceHolder.Callba
         switch (v.getId()) {
             case R.id.bClose:
                 videoView.stopPlayback();
-                mHelpers.destroyVideoSurface(mWindowManager, mVideoOverlayLayout);
+                destroyVideoSurface(mWindowManager, mVideoOverlayLayout);
         }
     }
 

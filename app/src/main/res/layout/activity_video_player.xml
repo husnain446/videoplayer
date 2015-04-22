@@ -1,5 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/videoLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000000"
@@ -7,18 +8,29 @@
 
     <VideoView
         android:id="@+id/videoSurface"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="fill_parent"
-        android:layout_centerInParent="true" />
+        android:layout_centerInParent="true"/>
 
     <Button
-        android:theme="@android:style/Animation.Toast"
         android:id="@+id/overlayButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="overlay"
+        android:visibility="invisible"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"/>
+
+    <Button
+        android:id="@+id/bRotate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="rotation"
+        android:visibility="invisible"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_gravity="right|top" />
 
 </RelativeLayout>
