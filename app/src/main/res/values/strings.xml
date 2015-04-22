@@ -7,5 +7,12 @@
     <string name="title_activity_search_results">SearchResultsActivity</string>
 
     <string name="hello_world">Hello world!</string>
+    <string name="title_section1">Videos</string>
+    <string name="title_section2">Settings</string>
+    <string name="title_section3">About</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="action_example">Example action</string>
     <string name="action_settings">Settings</string>
 </resources>

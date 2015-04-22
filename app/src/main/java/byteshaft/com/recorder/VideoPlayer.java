@@ -53,11 +53,11 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
                 case MotionEvent.ACTION_MOVE:
                     if (event.getRawY() > preValue) {
                         System.out.println("Going DOWN");
-                        brightness-=0.010;
+                        brightness -= 0.010;
                         setScreenBrightness(brightness);
                     } else {
                         System.out.println("Going UP");
-                        brightness+=0.005;
+                        brightness += 0.005;
                         setScreenBrightness(brightness);
                     }
                     clicked = false;
