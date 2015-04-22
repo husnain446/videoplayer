@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.wifi.WifiManager;
 import android.widget.MediaController;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -58,6 +59,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         videoView.setOnCompletionListener(this);
         layout.setOnTouchListener(this);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setScreenBrightness(Screen.Brightness.HIGH);
         MediaController mediaController = new MediaController(this) {
             @Override
