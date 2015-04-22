@@ -5,25 +5,24 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.widget.MediaController;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.VideoView;
 
 
 public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionListener,
-        Button.OnClickListener, View.OnTouchListener, VideoControllerView.MediaPlayerControl {
+        Button.OnClickListener, View.OnTouchListener {
 
 
     private String videoPath = null;
     private VideoView videoView = null;
     private boolean clicked = false;
-    VideoControllerView videoControllerView;
     private boolean isLandscape = true;
     private float relevantMoveStep = 0;
     private float initialTouchY = 0;
@@ -49,7 +48,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_video_player);
         RelativeLayout layout = (RelativeLayout) findViewById(R.id.videoLayout);
-        videoControllerView = new VideoControllerView(this);
         Bundle bundle = getIntent().getExtras();
         videoPath = bundle.getString("videoUri");
         videoView = (VideoView) findViewById(R.id.videoSurface);
@@ -57,11 +55,16 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         layout.setOnTouchListener(this);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setScreenBrightness(Screen.Brightness.HIGH);
-        videoControllerView.setMediaPlayer(this);
-        videoControllerView.setAnchorView((FrameLayout) findViewById(R.id.videoSurfaceContainer));
+        MediaController mediaController = new MediaController(this);
+        mediaController.setAnchorView(videoView);
+        videoView.setMediaController(mediaController);
         videoView.setVideoPath(videoPath);
         videoView.start();
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
     }
 
     @Override
@@ -134,13 +137,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
                 }
                 return true;
             case MotionEvent.ACTION_UP:
-                if (clicked) {
-                    if (videoControllerView.isShowing()) {
-                        videoControllerView.hide();
-                    } else {
-                        videoControllerView.show();
-                    }
-                }
                 return true;
         }
         return false;
@@ -189,66 +185,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
 
     private float getCurrentBrightness() {
         return getWindow().getAttributes().screenBrightness;
-    }
-    
-    @Override
-    public boolean canPause() {
-        return true;
-    }
-
-    @Override
-    public boolean canSeekBackward() {
-        return true;
-    }
-
-    @Override
-    public boolean canSeekForward() {
-        return true;
-    }
-
-    @Override
-    public int getBufferPercentage() {
-        return 0;
-    }
-
-    @Override
-    public int getCurrentPosition() {
-        return videoView.getCurrentPosition();
-    }
-
-    @Override
-    public int getDuration() {
-        return videoView.getDuration();
-    }
-
-    @Override
-    public boolean isPlaying() {
-        return videoView.isPlaying();
-    }
-
-    @Override
-    public void pause() {
-        videoView.pause();
-    }
-
-    @Override
-    public void seekTo(int i) {
-
-    }
-
-    @Override
-    public void start() {
-        videoView.start();
-    }
-
-    @Override
-    public boolean isFullScreen() {
-        return false;
-    }
-
-    @Override
-    public void toggleFullScreen() {
-
     }
 
     private int getCurrentVolume() {

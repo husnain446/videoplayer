@@ -2,6 +2,7 @@ package byteshaft.com.recorder;
 
 import android.app.ListActivity;
 import android.app.SearchManager;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -12,12 +13,14 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.view.MenuItemCompat;
 import android.text.TextUtils;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -42,10 +45,7 @@ public class MainActivity extends ListActivity implements SearchView.OnQueryText
         super.onCreate(savedInstanceState);
         mHelper = new Helpers(getApplicationContext());
         allVideos = mHelper.getAllVideosUri();
-        realVideos = mHelper.getVideoTitles(allVideos);
-        modeAdapter = new ThumbnailAdapter(MainActivity.this, R.layout.row, realVideos);
-        setListAdapter(modeAdapter);
-        getListView().setDivider(null);
+        setupListView();
     }
 
     @Override
@@ -74,8 +74,8 @@ public class MainActivity extends ListActivity implements SearchView.OnQueryText
                 LayoutInflater inflater = getLayoutInflater();
                 row = inflater.inflate(R.layout.row, parent, false);
             }
-            TextView textfilePath = (TextView) row.findViewById(R.id.FilePath);
-            textfilePath.setText(realVideos[position]);
+            TextView textFilePath = (TextView) row.findViewById(R.id.FilePath);
+            textFilePath.setText(realVideos[position]);
             TextView textView = (TextView) row.findViewById(R.id.tv);
             textView.setText(stringForTime(getDurationForVideo(position)));
             ImageView imageThumbnail = (ImageView) row.findViewById(R.id.Thumbnail);
@@ -147,7 +147,7 @@ public class MainActivity extends ListActivity implements SearchView.OnQueryText
             int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
             cursor.moveToPosition(thumbId);
             int id = cursor.getInt(idColumn);
-
+                cursor.close();
             return MediaStore.Video.Thumbnails.getThumbnail(
                     getContentResolver(), id, MediaStore.Video.Thumbnails.MICRO_KIND, null);
         }
@@ -181,6 +181,52 @@ public class MainActivity extends ListActivity implements SearchView.OnQueryText
             return mFormatter.format("%02d:%02d", minutes, seconds).toString();
         }
     }
+    @Override
+    public void onCreateContextMenu (ContextMenu menu, View v, ContextMenu.ContextMenuInfo
+            menuInfo){
+        super.onCreateContextMenu(menu, v, menuInfo);
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
+        menu.setHeaderTitle(realVideos[info.position]);
+        String[] menuItems = {"Play", "Delete"};
+        for (int i = 0; i < menuItems.length; i++) {
+            menu.add(Menu.NONE, i, i, menuItems[i]);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected (MenuItem item){
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        int menuItemIndex = item.getItemId();
+        String[] menuItems = {"Play", "Delete"};
+        String menuItemName = menuItems[menuItemIndex];
+        String listItemName = allVideos.get(info.position);
+        if (menuItemName.equals("Play")) {
+            playVideoForLocation(listItemName);
+        } else if (menuItemName.equals("Delete")) {
+            deleteFile(info);
+            allVideos.remove(info.position);
+            setupListView();
+
+        }
+        return super.onContextItemSelected(item);
+
+    }
+
+    @Override
+    public void unregisterForContextMenu (View view){
+        super.unregisterForContextMenu(view);
+    }
+
+    private void deleteFile(AdapterView.AdapterContextMenuInfo info) {
+        String[] projection = {MediaStore.Video.Media._ID};
+        Cursor cursor = getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                projection, null, null, null);
+        int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
+        cursor.moveToPosition(info.position);
+        int id = cursor.getInt(idColumn);
+        Uri uri = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id);
+        getContentResolver().delete(uri, null, null);
+    }
 
     private int getDurationForVideo(int position) {
         String[] projection = {MediaStore.Video.Media.DURATION};
@@ -189,6 +235,15 @@ public class MainActivity extends ListActivity implements SearchView.OnQueryText
         int durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.VideoColumns.DURATION);
         cursor.moveToPosition(position);
         String duration = cursor.getString(durationColumn);
+        cursor.close();
         return Integer.valueOf(duration);
+    }
+
+    private void setupListView() {
+        realVideos = mHelper.getVideoTitles(allVideos);
+        modeAdapter = new ThumbnailAdapter(MainActivity.this, R.layout.row, realVideos);
+        setListAdapter(modeAdapter);
+        getListView().setDivider(null);
+        registerForContextMenu(getListView());
     }
 }

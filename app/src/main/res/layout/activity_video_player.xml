@@ -17,18 +17,6 @@
         android:layout_height="fill_parent"
         android:layout_gravity="center_horizontal"/>
 
-    </FrameLayout>
-
-    <Button
-        android:id="@+id/overlayButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="overlay"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:onClick="onClick"/>
-
         <Button
             android:id="@+id/bRotate"
             android:layout_width="wrap_content"
@@ -38,7 +26,20 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true"
             android:onClick="onClick"
-            android:layout_gravity="right|top" />
+            android:layout_gravity="left|bottom" />
+
+        <Button
+            android:id="@+id/overlayButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="overlay"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:onClick="onClick"
+            android:layout_gravity="right|bottom" />
+
+    </FrameLayout>
 
 
 </RelativeLayout>
