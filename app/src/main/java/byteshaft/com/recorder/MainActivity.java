@@ -6,17 +6,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.view.MenuItemCompat;
 import android.text.TextUtils;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,10 +25,9 @@ import android.widget.SearchView;
 import android.widget.TextView;
 
 import java.io.File;
-import java.net.URI;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Formatter;
+import java.util.Locale;
 
 
 public class MainActivity extends ListActivity implements SearchView.OnQueryTextListener {
@@ -82,6 +76,8 @@ public class MainActivity extends ListActivity implements SearchView.OnQueryText
             }
             TextView textfilePath = (TextView) row.findViewById(R.id.FilePath);
             textfilePath.setText(realVideos[position]);
+            TextView textView = (TextView) row.findViewById(R.id.tv);
+            textView.setText(stringForTime(getDurationForVideo(position)));
             ImageView imageThumbnail = (ImageView) row.findViewById(R.id.Thumbnail);
             File file = new File(allVideos.get(position));
             String name = String.valueOf(file.hashCode());
@@ -166,5 +162,33 @@ public class MainActivity extends ListActivity implements SearchView.OnQueryText
             Uri uri = Uri.parse(filePath);
             thumbnailContainer.setImageURI(uri);
         }
+    }
+
+    private String stringForTime(int timeMs) {
+        int totalSeconds = timeMs / 1000;
+
+        int seconds = totalSeconds % 60;
+        int minutes = (totalSeconds / 60) % 60;
+        int hours = totalSeconds / 3600;
+
+        StringBuilder mFormatBuilder = new StringBuilder();
+        Formatter mFormatter = new Formatter(mFormatBuilder, Locale.getDefault());
+
+        mFormatBuilder.setLength(0);
+        if (hours > 0) {
+            return mFormatter.format("%d:%02d:%02d", hours, minutes, seconds).toString();
+        } else {
+            return mFormatter.format("%02d:%02d", minutes, seconds).toString();
+        }
+    }
+
+    private int getDurationForVideo(int position) {
+        String[] projection = {MediaStore.Video.Media.DURATION};
+        Cursor cursor = getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                projection, null, null, null);
+        int durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.VideoColumns.DURATION);
+        cursor.moveToPosition(position);
+        String duration = cursor.getString(durationColumn);
+        return Integer.valueOf(duration);
     }
 }
