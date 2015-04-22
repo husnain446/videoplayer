@@ -29,6 +29,8 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Formatter;
+import java.util.Locale;
 
 
 public class MainActivity extends ListActivity implements SearchView.OnQueryTextListener {
@@ -72,8 +74,10 @@ public class MainActivity extends ListActivity implements SearchView.OnQueryText
                 LayoutInflater inflater = getLayoutInflater();
                 row = inflater.inflate(R.layout.row, parent, false);
             }
-            TextView textfilePath = (TextView) row.findViewById(R.id.FilePath);
-            textfilePath.setText(realVideos[position]);
+            TextView textFilePath = (TextView) row.findViewById(R.id.FilePath);
+            textFilePath.setText(realVideos[position]);
+            TextView textView = (TextView) row.findViewById(R.id.tv);
+            textView.setText(stringForTime(getDurationForVideo(position)));
             ImageView imageThumbnail = (ImageView) row.findViewById(R.id.Thumbnail);
             File file = new File(allVideos.get(position));
             String name = String.valueOf(file.hashCode());
@@ -143,7 +147,7 @@ public class MainActivity extends ListActivity implements SearchView.OnQueryText
             int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
             cursor.moveToPosition(thumbId);
             int id = cursor.getInt(idColumn);
-
+                cursor.close();
             return MediaStore.Video.Thumbnails.getThumbnail(
                     getContentResolver(), id, MediaStore.Video.Thumbnails.MICRO_KIND, null);
         }
@@ -160,20 +164,38 @@ public class MainActivity extends ListActivity implements SearchView.OnQueryText
         }
     }
 
+    private String stringForTime(int timeMs) {
+        int totalSeconds = timeMs / 1000;
+
+        int seconds = totalSeconds % 60;
+        int minutes = (totalSeconds / 60) % 60;
+        int hours = totalSeconds / 3600;
+
+        StringBuilder mFormatBuilder = new StringBuilder();
+        Formatter mFormatter = new Formatter(mFormatBuilder, Locale.getDefault());
+
+        mFormatBuilder.setLength(0);
+        if (hours > 0) {
+            return mFormatter.format("%d:%02d:%02d", hours, minutes, seconds).toString();
+        } else {
+            return mFormatter.format("%02d:%02d", minutes, seconds).toString();
+        }
+    }
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+    public void onCreateContextMenu (ContextMenu menu, View v, ContextMenu.ContextMenuInfo
+            menuInfo){
         super.onCreateContextMenu(menu, v, menuInfo);
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)menuInfo;
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         menu.setHeaderTitle(realVideos[info.position]);
         String[] menuItems = {"Play", "Delete"};
-        for (int i = 0; i<menuItems.length; i++) {
+        for (int i = 0; i < menuItems.length; i++) {
             menu.add(Menu.NONE, i, i, menuItems[i]);
         }
     }
 
     @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+    public boolean onContextItemSelected (MenuItem item){
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         int menuItemIndex = item.getItemId();
         String[] menuItems = {"Play", "Delete"};
         String menuItemName = menuItems[menuItemIndex];
@@ -191,7 +213,7 @@ public class MainActivity extends ListActivity implements SearchView.OnQueryText
     }
 
     @Override
-    public void unregisterForContextMenu(View view) {
+    public void unregisterForContextMenu (View view){
         super.unregisterForContextMenu(view);
     }
 
@@ -204,6 +226,17 @@ public class MainActivity extends ListActivity implements SearchView.OnQueryText
         int id = cursor.getInt(idColumn);
         Uri uri = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id);
         getContentResolver().delete(uri, null, null);
+    }
+
+    private int getDurationForVideo(int position) {
+        String[] projection = {MediaStore.Video.Media.DURATION};
+        Cursor cursor = getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                projection, null, null, null);
+        int durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.VideoColumns.DURATION);
+        cursor.moveToPosition(position);
+        String duration = cursor.getString(durationColumn);
+        cursor.close();
+        return Integer.valueOf(duration);
     }
 
     private void setupListView() {
