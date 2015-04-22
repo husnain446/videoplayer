@@ -48,6 +48,10 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_video_player);
         RelativeLayout layout = (RelativeLayout) findViewById(R.id.videoLayout);
+        final Button overlayButton = (Button) findViewById(R.id.overlayButton);
+        final Button rotationButton = (Button) findViewById(R.id.bRotate);
+        overlayButton.setOnClickListener(this);
+        rotationButton.setOnClickListener(this);
         Bundle bundle = getIntent().getExtras();
         videoPath = bundle.getString("videoUri");
         videoView = (VideoView) findViewById(R.id.videoSurface);
@@ -55,16 +59,25 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         layout.setOnTouchListener(this);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setScreenBrightness(Screen.Brightness.HIGH);
-        MediaController mediaController = new MediaController(this);
+        MediaController mediaController = new MediaController(this) {
+            @Override
+            public void show() {
+                super.show();
+                overlayButton.setVisibility(VISIBLE);
+                rotationButton.setVisibility(VISIBLE);
+            }
+
+            @Override
+            public void hide() {
+                super.hide();
+                overlayButton.setVisibility(INVISIBLE);
+                rotationButton.setVisibility(INVISIBLE);
+            }
+        };
         mediaController.setAnchorView(videoView);
         videoView.setMediaController(mediaController);
         videoView.setVideoPath(videoPath);
         videoView.start();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
     }
 
     @Override
@@ -168,6 +181,8 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     public void onCompletion(MediaPlayer mp) {
         finish();
     }
+
+
 
     private void setScreenBrightness(float value) {
         System.out.println(String.format("Attempted value %f", value));
