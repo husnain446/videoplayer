@@ -95,6 +95,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         final int VOLUME_STEP = 1;
         final int ACTIVITY_HEIGHT_FRAGMENT = v.getHeight() / 50;
 
+
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 initialTouchY = event.getY();

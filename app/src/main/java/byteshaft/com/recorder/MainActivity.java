@@ -1,17 +1,22 @@
 package byteshaft.com.recorder;
 
-import android.app.ListActivity;
+import android.app.Activity;
 import android.app.SearchManager;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v4.app.ListFragment;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -24,6 +29,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -33,26 +39,33 @@ import java.util.Formatter;
 import java.util.Locale;
 
 
-public class MainActivity extends ListActivity implements SearchView.OnQueryTextListener {
+public class MainActivity extends ActionBarActivity implements SearchView.OnQueryTextListener ,
+        NavigationDrawerFragment.NavigationDrawerCallbacks {
 
-    private ArrayList<String> allVideos = null;
-    private String[] realVideos = null;
-    private ArrayAdapter<String> modeAdapter = null;
+    private  ArrayList<String> allVideos = null;
+    private  String[] realVideos = null;
+    static ArrayAdapter<String> modeAdapter = null;
+    private CharSequence mTitle;
+    NavigationDrawerFragment mNavigationDrawerFragment;
+    RelativeLayout relativeLayout;
     private Helpers mHelper = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
         mHelper = new Helpers(getApplicationContext());
+        relativeLayout = (RelativeLayout) findViewById(R.id.videoLayout);
+        mNavigationDrawerFragment = (NavigationDrawerFragment)
+                getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
+        mNavigationDrawerFragment.setUp(
+                R.id.navigation_drawer,
+                (DrawerLayout) findViewById(R.id.drawer_layout));
         allVideos = mHelper.getAllVideosUri();
-        setupListView();
-    }
-
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-        String videoName = allVideos.get(position);
-        playVideoForLocation(videoName);
+        realVideos = mHelper.getVideoTitles(allVideos);
+        modeAdapter = new ThumbnailAdapter(this, R.layout.row, realVideos);
+        allVideos = mHelper.getAllVideosUri();
+//        registerForContextMenu(getListView());
     }
 
     private void playVideoForLocation(String filename) {
@@ -95,6 +108,11 @@ public class MainActivity extends ListActivity implements SearchView.OnQueryText
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        if (!mNavigationDrawerFragment.isDrawerOpen()) {
+            getMenuInflater().inflate(R.menu.main, menu);
+            restoreActionBar();
+            return true;
+        }
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
         SearchManager manager = (SearchManager) getSystemService(SEARCH_SERVICE);
@@ -108,11 +126,6 @@ public class MainActivity extends ListActivity implements SearchView.OnQueryText
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public boolean onQueryTextSubmit(String query) {
         return true;
     }
@@ -122,11 +135,53 @@ public class MainActivity extends ListActivity implements SearchView.OnQueryText
         if (TextUtils.isEmpty(newText)) {
             modeAdapter.notifyDataSetChanged();
             modeAdapter.getFilter().filter("");
-            getListView().clearTextFilter();
         } else {
             modeAdapter.getFilter().filter(newText);
         }
         return true;
+    }
+
+    @Override
+    public void onNavigationDrawerItemSelected(int position) {
+        switch (position) {
+            case 0:
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, new Fragments().newInstance(position + 1, 0)).commit();
+                break;
+            case 1:
+                FragmentManager fragmentManager1 = getSupportFragmentManager();
+                fragmentManager1.beginTransaction()
+                        .replace(R.id.container, new Fragments().newInstance(position + 1, 1)).commit();
+                break;
+        }
+    }
+
+    public void onSectionAttached(int number) {
+        switch (number) {
+            case 1:
+                mTitle = getString(R.string.title_section1);
+                break;
+            case 2:
+                mTitle = getString(R.string.title_section2);
+                break;
+        }
+    }
+
+    public void restoreActionBar() {
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        actionBar.setDisplayShowTitleEnabled(true);
+        actionBar.setTitle(mTitle);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     class ThumbnailCreationTask extends AsyncTask<Void, Void, Bitmap> {
@@ -205,7 +260,6 @@ public class MainActivity extends ListActivity implements SearchView.OnQueryText
         } else if (menuItemName.equals("Delete")) {
             deleteFile(info);
             allVideos.remove(info.position);
-            setupListView();
 
         }
         return super.onContextItemSelected(item);
@@ -238,12 +292,45 @@ public class MainActivity extends ListActivity implements SearchView.OnQueryText
         cursor.close();
         return Integer.valueOf(duration);
     }
+    public  class Fragments extends ListFragment {
 
-    private void setupListView() {
-        realVideos = mHelper.getVideoTitles(allVideos);
-        modeAdapter = new ThumbnailAdapter(MainActivity.this, R.layout.row, realVideos);
-        setListAdapter(modeAdapter);
-        getListView().setDivider(null);
-        registerForContextMenu(getListView());
+        int fragmentValue;
+        private static final String ARG_SECTION_NUMBER = "section_number";
+
+        public Fragments newInstance(int sectionNumber , int value) {
+            Fragments fragment = new Fragments();
+            Bundle args = new Bundle();
+            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            fragment.setArguments(args);
+            fragmentValue = value;
+            return fragment;
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = null;
+            if (fragmentValue == 0) {
+                rootView = inflater.inflate(R.layout.fragment_main, container, false);
+                setListAdapter(MainActivity.modeAdapter);
+            } else if (fragmentValue ==1) {
+                rootView = inflater.inflate(R.layout.fragment, container, false);
+            }
+            return rootView;
+        }
+
+        @Override
+        public void onAttach(Activity activity) {
+            super.onAttach(activity);
+            ((MainActivity) activity).onSectionAttached(
+                    getArguments().getInt(ARG_SECTION_NUMBER));
+        }
+
+        @Override
+        public void onListItemClick(ListView l, View v, int position, long id) {
+            super.onListItemClick(l, v, position, id);
+            String videoName = allVideos.get(position);
+            playVideoForLocation(videoName);
+        }
     }
 }
