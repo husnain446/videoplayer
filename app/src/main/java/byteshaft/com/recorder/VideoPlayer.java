@@ -31,7 +31,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     private static class Screen {
         static class Brightness {
             static final float HIGH = 1f;
-            static final float DEFAULT = -1f;
             static final float LOW = 0f;
         }
     }
