@@ -149,12 +149,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.search) {
-            System.out.println("Clicked");
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+        return mDrawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
 
     @Override
