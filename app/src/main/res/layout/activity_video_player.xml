@@ -14,9 +14,9 @@
 
     <Button
         android:id="@+id/overlayButton"
+        android:text="overlay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="overlay"
         android:visibility="invisible"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
@@ -24,9 +24,9 @@
 
     <Button
         android:id="@+id/bRotate"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="rotation"
+        android:layout_width="30dip"
+        android:layout_height="30dip"
+        android:background="@drawable/rotate"
         android:visibility="invisible"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
