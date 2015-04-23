@@ -84,7 +84,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     @Override
     protected void onPause() {
         super.onPause();
-        setScreenBrightness(Screen.Brightness.DEFAULT);
         videoView.stopPlayback();
     }
 
