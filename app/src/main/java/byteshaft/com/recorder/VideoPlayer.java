@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.net.wifi.WifiManager;
 import android.widget.MediaController;
 import android.os.Bundle;
 import android.view.MotionEvent;
