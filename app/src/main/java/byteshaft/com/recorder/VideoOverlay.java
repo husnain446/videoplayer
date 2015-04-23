@@ -106,7 +106,7 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
         params.type = WindowManager.LayoutParams.TYPE_PHONE;
         params.flags = WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS |
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
-        params.format = PixelFormat.TRANSLUCENT;
+        params.format = PixelFormat.RGBA_8888;
         params.gravity = Gravity.TOP | Gravity.START;
         return params;
     }
