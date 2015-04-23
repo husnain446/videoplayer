@@ -201,6 +201,12 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
             super.onListItemClick(l, v, position, id);
             mHelper.playVideoForLocation(mVideosPathList.get(position));
         }
+
+        @Override
+        public void onActivityCreated(Bundle savedInstanceState) {
+            super.onActivityCreated(savedInstanceState);
+            registerForContextMenu(getListView());
+        }
     }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
