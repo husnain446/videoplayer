@@ -3,7 +3,6 @@ package byteshaft.com.recorder;
 import android.app.Fragment;
 import android.app.SearchManager;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.net.Uri;
 import android.app.ListFragment;
@@ -31,14 +30,15 @@ import java.util.ArrayList;
 
 public class MainActivity extends ActionBarActivity implements SearchView.OnQueryTextListener {
 
-    private  ArrayList<String> allVideos = null;
-    private  String[] realVideos = null;
-    static ArrayAdapter<String> modeAdapter = null;
+    static ArrayAdapter<String> sModeAdapter = null;
+
+    private ArrayList<String> mVideosPathList = null;
+    private String[] mVideosTitles = null;
     private CharSequence mTitle = "Videos";
     private CharSequence mDrawerTitle = "Video Player";
     private Helpers mHelper = null;
     private ListView mDrawerList = null;
-    private String[] mListTitles = {"Videos", "Settings"};
+    private String[] mListTitles = {"Videos", "Settings", "About"};
     private DrawerLayout mDrawerLayout = null;
     private ActionBarDrawerToggle mDrawerToggle = null;
 
@@ -67,10 +67,10 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
             }
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-        allVideos = mHelper.getAllVideosUri();
-        realVideos = mHelper.getVideoTitles(allVideos);
-        modeAdapter = new ThumbnailAdapter(this, R.layout.row, realVideos);
-        allVideos = mHelper.getAllVideosUri();
+        mVideosPathList = mHelper.getAllVideosUri();
+        mVideosTitles = mHelper.getVideoTitles(mVideosPathList);
+        sModeAdapter = new VideoListAdapter(this, R.layout.row, mVideosTitles);
+        mVideosPathList = mHelper.getAllVideosUri();
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         mDrawerList.setAdapter(new ArrayAdapter<>(this,
                 R.layout.drawer_list_item, mListTitles));
@@ -84,9 +84,9 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         mDrawerToggle.syncState();
     }
 
-    class ThumbnailAdapter extends ArrayAdapter<String> {
+    class VideoListAdapter extends ArrayAdapter<String> {
 
-        public ThumbnailAdapter(Context context, int resource, String[] videos) {
+        public VideoListAdapter(Context context, int resource, String[] videos) {
             super(context, resource, videos);
         }
 
@@ -98,11 +98,11 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
                 row = inflater.inflate(R.layout.row, parent, false);
             }
             TextView textFilePath = (TextView) row.findViewById(R.id.FilePath);
-            textFilePath.setText(realVideos[position]);
+            textFilePath.setText(mVideosTitles[position]);
             TextView textView = (TextView) row.findViewById(R.id.tv);
             textView.setText(mHelper.getFormattedTime(mHelper.getDurationForVideo(position)));
             ImageView imageThumbnail = (ImageView) row.findViewById(R.id.Thumbnail);
-            File file = new File(allVideos.get(position));
+            File file = new File(mVideosPathList.get(position));
             String name = String.valueOf(file.hashCode());
             String filePath = getFilesDir().getAbsolutePath() + "/" + name;
             Uri uri = Uri.parse(filePath);
@@ -111,7 +111,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
                 imageThumbnail.setImageURI(uri);
             } else {
                 new ThumbnailCreationTask(getApplicationContext(), imageThumbnail,
-                        allVideos, position).execute();
+                        mVideosPathList, position).execute();
             }
             return row;
         }
@@ -139,10 +139,9 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     @Override
     public boolean onQueryTextChange(String newText) {
         if (TextUtils.isEmpty(newText)) {
-            modeAdapter.notifyDataSetChanged();
-            modeAdapter.getFilter().filter("");
+            sModeAdapter.getFilter().filter("");
         } else {
-            modeAdapter.getFilter().filter(newText);
+            sModeAdapter.getFilter().filter(newText);
         }
         return true;
     }
@@ -157,7 +156,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
             menuInfo){
         super.onCreateContextMenu(menu, v, menuInfo);
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
-        menu.setHeaderTitle(realVideos[info.position]);
+        menu.setHeaderTitle(mVideosTitles[info.position]);
         String[] menuItems = {"Play", "Delete"};
         for (int i = 0; i < menuItems.length; i++) {
             menu.add(Menu.NONE, i, i, menuItems[i]);
@@ -170,12 +169,12 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         int menuItemIndex = item.getItemId();
         String[] menuItems = {"Play", "Delete"};
         String menuItemName = menuItems[menuItemIndex];
-        String listItemName = allVideos.get(info.position);
+        String listItemName = mVideosPathList.get(info.position);
         if (menuItemName.equals("Play")) {
             mHelper.playVideoForLocation(listItemName);
         } else if (menuItemName.equals("Delete")) {
             mHelper.deleteFile(info.position);
-            allVideos.remove(info.position);
+            mVideosPathList.remove(info.position);
 
         }
         return super.onContextItemSelected(item);
@@ -193,15 +192,14 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            setListAdapter(modeAdapter);
-//            registerForContextMenu(getListView());
+            setListAdapter(sModeAdapter);
             return rootView;
         }
 
         @Override
         public void onListItemClick(ListView l, View v, int position, long id) {
             super.onListItemClick(l, v, position, id);
-            mHelper.playVideoForLocation(allVideos.get(position));
+            mHelper.playVideoForLocation(mVideosPathList.get(position));
         }
     }
 
