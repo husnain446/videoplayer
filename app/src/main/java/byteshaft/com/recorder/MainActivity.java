@@ -47,7 +47,6 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     static ArrayAdapter<String> modeAdapter = null;
     private CharSequence mTitle;
     NavigationDrawerFragment mNavigationDrawerFragment;
-    RelativeLayout relativeLayout;
     private Helpers mHelper = null;
 
     @Override
@@ -55,7 +54,6 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mHelper = new Helpers(getApplicationContext());
-        relativeLayout = (RelativeLayout) findViewById(R.id.videoLayout);
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         mNavigationDrawerFragment.setUp(
