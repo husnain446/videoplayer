@@ -1,21 +1,27 @@
 package byteshaft.com.recorder;
 
 
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
+import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.VideoView;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Formatter;
+import java.util.Locale;
 
 
 public class Helpers extends ContextWrapper {
@@ -113,6 +119,53 @@ public class Helpers extends ContextWrapper {
             outputStream.flush();
             outputStream.close();
         } catch (IOException ignored) {
+        }
+    }
+
+    void playVideoForLocation(String filename) {
+        Intent intent = new Intent(getApplicationContext(), VideoPlayer.class);
+        intent.putExtra("videoUri", filename);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
+    void deleteFile(int databaseIndex) {
+        String[] projection = {MediaStore.Video.Media._ID};
+        Cursor cursor = getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                projection, null, null, null);
+        int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
+        cursor.moveToPosition(databaseIndex);
+        int id = cursor.getInt(idColumn);
+        Uri uri = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id);
+        getContentResolver().delete(uri, null, null);
+    }
+
+    int getDurationForVideo(int databaseIndex) {
+        String[] projection = {MediaStore.Video.Media.DURATION};
+        Cursor cursor = getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                projection, null, null, null);
+        int durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.VideoColumns.DURATION);
+        cursor.moveToPosition(databaseIndex);
+        String duration = cursor.getString(durationColumn);
+        cursor.close();
+        return Integer.valueOf(duration);
+    }
+
+    String getFormattedTime(int timeMs) {
+        int totalSeconds = timeMs / 1000;
+
+        int seconds = totalSeconds % 60;
+        int minutes = (totalSeconds / 60) % 60;
+        int hours = totalSeconds / 3600;
+
+        StringBuilder mFormatBuilder = new StringBuilder();
+        Formatter mFormatter = new Formatter(mFormatBuilder, Locale.getDefault());
+
+        mFormatBuilder.setLength(0);
+        if (hours > 0) {
+            return mFormatter.format("%d:%02d:%02d", hours, minutes, seconds).toString();
+        } else {
+            return mFormatter.format("%02d:%02d", minutes, seconds).toString();
         }
     }
 }
