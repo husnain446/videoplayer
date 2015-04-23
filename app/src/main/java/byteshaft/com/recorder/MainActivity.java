@@ -3,6 +3,7 @@ package byteshaft.com.recorder;
 import android.app.Fragment;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.net.Uri;
 import android.app.ListFragment;
@@ -75,6 +76,12 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
                 R.layout.drawer_list_item, mListTitles));
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
         selectItem(0);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
     }
 
     class ThumbnailAdapter extends ArrayAdapter<String> {
