@@ -45,7 +45,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_video_player);
         RelativeLayout layout = (RelativeLayout) findViewById(R.id.videoLayout);
         final Button overlayButton = (Button) findViewById(R.id.overlayButton);
@@ -58,7 +57,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         videoView.setOnCompletionListener(this);
         layout.setOnTouchListener(this);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setScreenBrightness(Screen.Brightness.HIGH);
         MediaController mediaController = new MediaController(this) {
             @Override
@@ -182,8 +180,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     public void onCompletion(MediaPlayer mp) {
         finish();
     }
-
-
 
     private void setScreenBrightness(float value) {
         System.out.println(String.format("Attempted value %f", value));
