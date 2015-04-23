@@ -26,6 +26,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     private boolean isLandscape = true;
     private float relevantMoveStep = 0;
     private float initialTouchY = 0;
+    private Helpers mHelpers = null;
 
     private static class Screen {
         static class Brightness {
@@ -46,6 +47,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_player);
+        mHelpers = new Helpers(getApplicationContext());
         RelativeLayout layout = (RelativeLayout) findViewById(R.id.videoLayout);
         final Button overlayButton = (Button) findViewById(R.id.overlayButton);
         final Button rotationButton = (Button) findViewById(R.id.bRotate);
@@ -57,7 +59,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         videoView.setOnCompletionListener(this);
         layout.setOnTouchListener(this);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        setScreenBrightness(Screen.Brightness.HIGH);
+        mHelpers.setScreenBrightness(getWindow(), Screen.Brightness.HIGH);
         MediaController mediaController = new MediaController(this) {
             @Override
             public void show() {
@@ -102,14 +104,14 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
                 float touchY = event.getY();
                 // If action is on the left half of the View.
                 if (touchX < v.getWidth() / 2) {
-                    float brightness = getCurrentBrightness();
+                    float brightness = mHelpers.getCurrentBrightness(getWindow());
                     if (touchY > initialTouchY &&
                             brightness - BRIGHTNESS_STEP > Screen.Brightness.LOW) {
                         System.out.println("Going DOWN");
                         relevantMoveStep = initialTouchY + ACTIVITY_HEIGHT_FRAGMENT;
                         if (touchY >= relevantMoveStep) {
                             brightness -= BRIGHTNESS_STEP;
-                            setScreenBrightness(brightness);
+                            mHelpers.setScreenBrightness(getWindow(), brightness);
                             initialTouchY = event.getY();
                         }
                     } else if (touchY < initialTouchY &&
@@ -118,18 +120,18 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
                         relevantMoveStep = initialTouchY - ACTIVITY_HEIGHT_FRAGMENT;
                         if (touchY <= relevantMoveStep) {
                             brightness += BRIGHTNESS_STEP;
-                            setScreenBrightness(brightness);
+                            mHelpers.setScreenBrightness(getWindow(), brightness);
                             initialTouchY = event.getY();
                         }
                     }
                 } else {
-                    int volume = getCurrentVolume();
+                    int volume = mHelpers.getCurrentVolume();
                     if (touchY > initialTouchY &&
                             volume - VOLUME_STEP >= Sound.Level.MINIMUM) {
                         relevantMoveStep = initialTouchY + ACTIVITY_HEIGHT_FRAGMENT;
                         if (touchY >= relevantMoveStep) {
                             volume -= VOLUME_STEP;
-                            setVolume(volume);
+                            mHelpers.setVolume(volume);
                             initialTouchY = event.getY();
                         }
                     } else if (touchY < initialTouchY &&
@@ -137,7 +139,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
                         relevantMoveStep = initialTouchY - ACTIVITY_HEIGHT_FRAGMENT;
                         if (touchY <= relevantMoveStep) {
                             volume += VOLUME_STEP;
-                            setVolume(volume);
+                            mHelpers.setVolume(volume);
                             initialTouchY = event.getY();
                         }
                     }
@@ -164,7 +166,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
                 videoOverlay.setVideoStartPosition(videoView.getCurrentPosition());
                 videoOverlay.startPlayback();
                 finish();
-                showDesktop();
+                mHelpers.showLauncherHome();
                 break;
             case R.id.bRotate:
                 if (isLandscape) {
@@ -179,33 +181,5 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     @Override
     public void onCompletion(MediaPlayer mp) {
         finish();
-    }
-
-    private void setScreenBrightness(float value) {
-        System.out.println(String.format("Attempted value %f", value));
-        WindowManager.LayoutParams layoutParams = getWindow().getAttributes();
-        layoutParams.screenBrightness = value;
-        getWindow().setAttributes(layoutParams);
-    }
-
-    private void showDesktop() {
-        Intent startMain = new Intent(Intent.ACTION_MAIN);
-        startMain.addCategory(Intent.CATEGORY_HOME);
-        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(startMain);
-    }
-
-    private float getCurrentBrightness() {
-        return getWindow().getAttributes().screenBrightness;
-    }
-
-    private int getCurrentVolume() {
-        AudioManager am = (AudioManager) getSystemService(AUDIO_SERVICE);
-        return am.getStreamVolume(AudioManager.STREAM_MUSIC);
-    }
-
-    private void setVolume(int level) {
-        AudioManager am = (AudioManager) getSystemService(AUDIO_SERVICE);
-        am.setStreamVolume(AudioManager.STREAM_MUSIC, level, 0);
     }
 }

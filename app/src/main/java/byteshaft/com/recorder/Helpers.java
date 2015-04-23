@@ -7,11 +7,13 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.VideoView;
@@ -167,5 +169,32 @@ public class Helpers extends ContextWrapper {
         } else {
             return mFormatter.format("%02d:%02d", minutes, seconds).toString();
         }
+    }
+
+    void setScreenBrightness(Window window, float value) {
+        WindowManager.LayoutParams layoutParams = window.getAttributes();
+        layoutParams.screenBrightness = value;
+        window.setAttributes(layoutParams);
+    }
+
+    void showLauncherHome() {
+        Intent startMain = new Intent(Intent.ACTION_MAIN);
+        startMain.addCategory(Intent.CATEGORY_HOME);
+        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(startMain);
+    }
+
+    float getCurrentBrightness(Window window) {
+        return window.getAttributes().screenBrightness;
+    }
+
+    int getCurrentVolume() {
+        AudioManager am = (AudioManager) getSystemService(AUDIO_SERVICE);
+        return am.getStreamVolume(AudioManager.STREAM_MUSIC);
+    }
+
+    void setVolume(int level) {
+        AudioManager am = (AudioManager) getSystemService(AUDIO_SERVICE);
+        am.setStreamVolume(AudioManager.STREAM_MUSIC, level, 0);
     }
 }
