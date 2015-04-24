@@ -25,6 +25,4 @@ public class CustomVideoView extends VideoView {
         super.pause();
         setKeepScreenOn(false);
     }
-
-    
 }
