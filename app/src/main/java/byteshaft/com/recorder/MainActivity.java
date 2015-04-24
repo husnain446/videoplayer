@@ -1,8 +1,10 @@
 package byteshaft.com.recorder;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.net.Uri;
 import android.app.ListFragment;
@@ -30,8 +32,7 @@ import java.util.ArrayList;
 
 public class MainActivity extends ActionBarActivity implements SearchView.OnQueryTextListener {
 
-    static ArrayAdapter<String> sModeAdapter = null;
-
+    private ArrayAdapter<String> mModeAdapter = null;
     private ArrayList<String> mVideosPathList = null;
     private String[] mVideosTitles = null;
     private CharSequence mTitle = "Videos";
@@ -69,8 +70,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mVideosPathList = mHelper.getAllVideosUri();
         mVideosTitles = mHelper.getVideoTitles(mVideosPathList);
-        sModeAdapter = new VideoListAdapter(this, R.layout.row, mVideosTitles);
-        mVideosPathList = mHelper.getAllVideosUri();
+        mModeAdapter = new VideoListAdapter(this, R.layout.row, mVideosPathList);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         mDrawerList.setAdapter(new ArrayAdapter<>(this,
                 R.layout.drawer_list_item, mListTitles));
@@ -86,12 +86,13 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
 
     class VideoListAdapter extends ArrayAdapter<String> {
 
-        public VideoListAdapter(Context context, int resource, String[] videos) {
+        public VideoListAdapter(Context context, int resource, ArrayList<String> videos) {
             super(context, resource, videos);
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+            System.out.println(position);
             View row = convertView;
             if (row == null) {
                 LayoutInflater inflater = getLayoutInflater();
@@ -139,9 +140,9 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     @Override
     public boolean onQueryTextChange(String newText) {
         if (TextUtils.isEmpty(newText)) {
-            sModeAdapter.getFilter().filter("");
+            mModeAdapter.getFilter().filter("");
         } else {
-            sModeAdapter.getFilter().filter(newText);
+            mModeAdapter.getFilter().filter(newText);
         }
         return true;
     }
@@ -164,8 +165,8 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     }
 
     @Override
-    public boolean onContextItemSelected (MenuItem item){
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+    public boolean onContextItemSelected (final MenuItem item){
+        final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         int menuItemIndex = item.getItemId();
         String[] menuItems = {"Play", "Delete"};
         String menuItemName = menuItems[menuItemIndex];
@@ -173,9 +174,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         if (menuItemName.equals("Play")) {
             mHelper.playVideoForLocation(listItemName);
         } else if (menuItemName.equals("Delete")) {
-            mHelper.deleteFile(info.position);
-            mVideosPathList.remove(info.position);
-
+            showDeleteConfirmationDialog(info.position);
         }
         return super.onContextItemSelected(item);
 
@@ -192,7 +191,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            setListAdapter(sModeAdapter);
+            setListAdapter(mModeAdapter);
             return rootView;
         }
 
@@ -218,7 +217,15 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     }
 
     private void selectItem(int position) {
-        Fragment fragment = new VideosFragment();
+        Fragment fragment = null;
+        switch (position) {
+            case 0:
+                fragment = new VideosFragment();
+                break;
+            case 1:
+                fragment = new SettingFragment();
+                break;
+        }
 
         // Insert the fragment by replacing any existing fragment
         android.app.FragmentManager fragmentManager = getFragmentManager();
@@ -228,5 +235,27 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         mDrawerList.setItemChecked(position, true);
         setTitle(mListTitles[position]);
         mDrawerLayout.closeDrawer(mDrawerList);
+    }
+
+    private void showDeleteConfirmationDialog(final int position) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Confirm Delete");
+        builder.setMessage("Do you want to delete this video ?");
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                mHelper.deleteFile(position);
+                mModeAdapter.remove(mModeAdapter.getItem(position));
+                mModeAdapter.notifyDataSetChanged();
+            }
+        });
+        builder.create();
+        builder.show();
     }
 }
