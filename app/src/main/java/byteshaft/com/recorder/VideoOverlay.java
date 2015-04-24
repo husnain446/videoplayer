@@ -4,7 +4,6 @@ package byteshaft.com.recorder;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -34,6 +33,8 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
     private double initialY = 0;
     private double initialTouchX = 0;
     private double initialTouchY = 0;
+    private double mVideoHeight = 0;
+    private double mVideoWidth = 0;
 
     public VideoOverlay(Context context) {
         super(context);
@@ -56,6 +57,14 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
 
     void setVideoStartPosition(int position) {
         this.position = position;
+    }
+
+    void setVideoHeight(int height) {
+        mVideoHeight = height;
+    }
+
+    void setVideoWidth(int width) {
+        mVideoWidth = width;
     }
 
     void startPlayback() {
@@ -88,18 +97,17 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
     }
 
     private WindowManager.LayoutParams getCustomWindowManagerParameters() {
-        Bitmap mVideoMetadata = getMetadataForVideo(fileRepo.getPath());
-        long height;
-        long width;
+        double height;
+        double width;
         double ratio;
-        if (isVideoPortrait(mVideoMetadata)) {
+        if (isVideoPortrait(mVideoHeight, mVideoWidth)) {
             width = getDensityPixels(150);
-            ratio = getVideoHeight(mVideoMetadata) / getVideoWidth(mVideoMetadata);
-            height = getInt(width * ratio);
+            ratio = mVideoHeight / mVideoWidth;
+            height = width * ratio;
         } else {
             height = getDensityPixels(150);
-            ratio = getVideoWidth(mVideoMetadata) / getVideoHeight(mVideoMetadata);
-            width = getInt(height * ratio);
+            ratio = mVideoWidth / mVideoHeight;
+            width = height * ratio;
         }
         WindowManager.LayoutParams params = new WindowManager.LayoutParams();
         params.height = (int) height;
