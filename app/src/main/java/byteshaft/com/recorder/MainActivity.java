@@ -1,8 +1,10 @@
 package byteshaft.com.recorder;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.net.Uri;
 import android.app.ListFragment;
@@ -164,7 +166,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     }
 
     @Override
-    public boolean onContextItemSelected (MenuItem item){
+    public boolean onContextItemSelected (final MenuItem item){
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         int menuItemIndex = item.getItemId();
         String[] menuItems = {"Play", "Delete"};
@@ -173,8 +175,22 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         if (menuItemName.equals("Play")) {
             mHelper.playVideoForLocation(listItemName);
         } else if (menuItemName.equals("Delete")) {
-            mHelper.deleteFile(info.position);
-            mVideosPathList.remove(info.position);
+            new AlertDialog.Builder(this).setTitle("Confirm Delete")
+                    .setMessage("Do you want to delete this video?")
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+                            mHelper.deleteFile(info.position);
+                            mVideosPathList.remove(info.position);
+                        }
+                    })
+                    .setNeutralButton("Cancel", null) // don't need to do anything but dismiss here
+                    .create()
+                    .show();
+
+
+
 
         }
         return super.onContextItemSelected(item);
