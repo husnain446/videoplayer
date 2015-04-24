@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -21,7 +22,7 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
 
     private final IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
     private WindowManager mWindowManager;
-    private String fileRepo;
+    private Uri fileRepo;
     private int position;
     private WindowManager.LayoutParams params;
     private boolean clicked = false;
@@ -49,8 +50,8 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
         close.setOnClickListener(this);
     }
 
-    void setVideoFile(String file) {
-        fileRepo = file;
+    void setVideoFile(Uri uri) {
+        fileRepo = uri;
     }
 
     void setVideoStartPosition(int position) {
@@ -64,7 +65,7 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         registerReceiver(mScreenStateListener, filter);
-        videoView.setVideoPath(fileRepo);
+        videoView.setVideoURI(fileRepo);
         videoView.seekTo(position);
         videoView.start();
     }
@@ -87,7 +88,7 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
     }
 
     private WindowManager.LayoutParams getCustomWindowManagerParameters() {
-        Bitmap mVideoMetadata = getMetadataForVideo(fileRepo);
+        Bitmap mVideoMetadata = getMetadataForVideo(fileRepo.getPath());
         long height;
         long width;
         double ratio;
