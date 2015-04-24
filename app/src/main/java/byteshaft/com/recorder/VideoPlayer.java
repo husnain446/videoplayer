@@ -1,19 +1,14 @@
 package byteshaft.com.recorder;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.widget.MediaController;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.RelativeLayout;
-import android.widget.VideoView;
 
 
 public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionListener,
@@ -21,7 +16,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
 
 
     private String videoPath = null;
-    private VideoView videoView = null;
+    private CustomVideoView customVideoView = null;
     private boolean clicked = false;
     private boolean isLandscape = true;
     private float relevantMoveStep = 0;
@@ -54,8 +49,8 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         rotationButton.setOnClickListener(this);
         Bundle bundle = getIntent().getExtras();
         videoPath = bundle.getString("videoUri");
-        videoView = (VideoView) findViewById(R.id.videoSurface);
-        videoView.setOnCompletionListener(this);
+        customVideoView = (CustomVideoView) findViewById(R.id.videoSurface);
+        customVideoView.setOnCompletionListener(this);
         layout.setOnTouchListener(this);
         mHelpers.setScreenBrightness(getWindow(), Screen.Brightness.HIGH);
         MediaController mediaController = new MediaController(this) {
@@ -73,16 +68,22 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
                 rotationButton.setVisibility(INVISIBLE);
             }
         };
-        mediaController.setAnchorView(videoView);
-        videoView.setMediaController(mediaController);
-        videoView.setVideoPath(videoPath);
-        videoView.start();
+        mediaController.setAnchorView(customVideoView);
+        customVideoView.setMediaController(mediaController);
+        customVideoView.setVideoPath(videoPath);
+        customVideoView.start();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        videoView.stopPlayback();
+        customVideoView.pause();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        customVideoView.stopPlayback();
     }
 
     @Override
@@ -90,7 +91,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         final double BRIGHTNESS_STEP = 0.066;
         final int VOLUME_STEP = 1;
         final int ACTIVITY_HEIGHT_FRAGMENT = v.getHeight() / 50;
-
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -158,10 +158,10 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.overlayButton:
-                videoView.pause();
+                customVideoView.pause();
                 VideoOverlay videoOverlay = new VideoOverlay(getApplicationContext());
-                videoOverlay.setVideoFile(videoPath);
-                videoOverlay.setVideoStartPosition(videoView.getCurrentPosition());
+                videoOverlay.setVideoFile(customVideoView.getVideoURI());
+                videoOverlay.setVideoStartPosition(customVideoView.getCurrentPosition());
                 videoOverlay.startPlayback();
                 finish();
                 mHelpers.showLauncherHome();
