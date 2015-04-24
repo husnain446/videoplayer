@@ -57,7 +57,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         videoView = (VideoView) findViewById(R.id.videoSurface);
         videoView.setOnCompletionListener(this);
         layout.setOnTouchListener(this);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         mHelpers.setScreenBrightness(getWindow(), Screen.Brightness.HIGH);
         MediaController mediaController = new MediaController(this) {
             @Override
