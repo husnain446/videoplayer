@@ -29,7 +29,7 @@
             android:label="@string/title_activity_video_player"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.Holo" >
+            android:theme="@style/PlayerTheme" >
         </activity>
         <activity
             android:name=".SearchResultsActivity"

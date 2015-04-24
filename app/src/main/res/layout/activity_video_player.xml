@@ -6,7 +6,7 @@
     android:background="#000000"
     tools:context="byteshaft.com.recorder.VideoPlayer">
 
-    <VideoView
+    <byteshaft.com.recorder.CustomVideoView
         android:id="@+id/videoSurface"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
