@@ -61,7 +61,6 @@ public class CustomVideoView extends VideoView {
     }
 
     public interface MediaPlayerStateChangedListener {
-
         public void onPlaybackStateChanged(int state);
     }
 }
