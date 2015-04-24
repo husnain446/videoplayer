@@ -55,14 +55,6 @@ public class Helpers extends ContextWrapper {
         return (WindowManager) getSystemService(Context.WINDOW_SERVICE);
     }
 
-    void togglePlayback(VideoView videoView) {
-        if (videoView.isPlaying()) {
-            videoView.pause();
-        } else {
-            videoView.start();
-        }
-    }
-
     void destroyVideoSurface(WindowManager mWindowManager, View view) {
         if (mWindowManager != null) {
             mWindowManager.removeView(view);

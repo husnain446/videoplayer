@@ -133,8 +133,13 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
                 return true;
             case MotionEvent.ACTION_UP:
                 if (clicked) {
-                    togglePlayback(videoView);
-                    toggleCloseButtonVisibility();
+                    if (videoView.isPlaying()) {
+                        videoView.pause();
+                        close.setVisibility(View.GONE);
+                    } else {
+                        videoView.start();
+                        close.setVisibility(View.VISIBLE);
+                    }
                 }
                 return true;
         }
@@ -152,14 +157,6 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
             case R.id.bClose:
                 videoView.stopPlayback();
                 destroyVideoSurface(mWindowManager, mVideoOverlayLayout);
-        }
-    }
-
-    private void toggleCloseButtonVisibility() {
-        if (videoView.isPlaying()) {
-            close.setVisibility(View.INVISIBLE);
-        } else {
-            close.setVisibility(View.VISIBLE);
         }
     }
 }
