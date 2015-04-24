@@ -30,6 +30,7 @@ public class CustomVideoView extends VideoView {
     @Override
     public void start() {
         super.start();
+        setKeepScreenOn(true);
         for (MediaPlayerStateChangedListener listener : mListeners) {
             listener.onPlaybackStateChanged(1);
         }
