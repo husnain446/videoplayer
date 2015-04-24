@@ -53,7 +53,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         mCustomVideoView.setOnCompletionListener(this);
         layout.setOnTouchListener(this);
         mHelpers.setScreenBrightness(getWindow(), Screen.Brightness.HIGH);
-        MediaController mediaController = new CustomMediaController(getApplicationContext());
+        MediaController mediaController = new CustomMediaController(this);
         mediaController.setAnchorView(mCustomVideoView);
         mCustomVideoView.setMediaController(mediaController);
         mCustomVideoView.setVideoPath(videoPath);
