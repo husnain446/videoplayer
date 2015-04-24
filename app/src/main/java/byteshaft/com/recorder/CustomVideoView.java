@@ -5,9 +5,15 @@ import android.net.Uri;
 import android.util.AttributeSet;
 import android.widget.VideoView;
 
+import java.util.ArrayList;
+
 public class CustomVideoView extends VideoView {
 
+    static final int PLAYING = 1;
+    static final int PAUSED = 0;
+
     private Uri currentlyPlayingVideoUri = null;
+    private ArrayList<MediaPlayerStateChangedListener> mListeners = new ArrayList<>();
 
     public CustomVideoView(Context context) {
         super(context);
@@ -17,16 +23,25 @@ public class CustomVideoView extends VideoView {
         super(context, attrs);
     }
 
+    public void setMediaPlayerStateChangedListener(MediaPlayerStateChangedListener listener) {
+        mListeners.add(listener);
+    }
+
     @Override
     public void start() {
         super.start();
-        setKeepScreenOn(true);
+        for (MediaPlayerStateChangedListener listener : mListeners) {
+            listener.onPlaybackStateChanged(1);
+        }
     }
 
     @Override
     public void pause() {
         super.pause();
         setKeepScreenOn(false);
+        for (MediaPlayerStateChangedListener listener : mListeners) {
+            listener.onPlaybackStateChanged(0);
+        }
     }
 
     @Override
@@ -43,5 +58,10 @@ public class CustomVideoView extends VideoView {
 
     public Uri getVideoURI() {
         return currentlyPlayingVideoUri;
+    }
+
+    public interface MediaPlayerStateChangedListener {
+
+        public void onPlaybackStateChanged(int state);
     }
 }
