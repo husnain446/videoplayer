@@ -15,10 +15,10 @@ import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.VideoView;
 
 public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
-        View.OnTouchListener, MediaPlayer.OnCompletionListener, View.OnClickListener {
+        View.OnTouchListener, MediaPlayer.OnCompletionListener, View.OnClickListener,
+        CustomVideoView.MediaPlayerStateChangedListener {
 
     private final IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
     private WindowManager mWindowManager;
@@ -28,23 +28,23 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
     private boolean clicked = false;
     private View mVideoOverlayLayout;
     private Button close;
-    private VideoView videoView;
+    private CustomVideoView mCustomVideoView;
     private ScreenStateListener mScreenStateListener = null;
     private double initialX = 0;
     private double initialY = 0;
     private double initialTouchX = 0;
     private double initialTouchY = 0;
 
-
     public VideoOverlay(Context context) {
         super(context);
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         mVideoOverlayLayout = inflater.inflate(R.layout.video_surface, null);
-        videoView = (VideoView) mVideoOverlayLayout.findViewById(R.id.videoView);
-        videoView.setOnCompletionListener(this);
-        videoView.setOnTouchListener(this);
-        mScreenStateListener = new ScreenStateListener(videoView);
-        SurfaceHolder holder = videoView.getHolder();
+        mCustomVideoView = (CustomVideoView) mVideoOverlayLayout.findViewById(R.id.videoView);
+        mCustomVideoView.setOnCompletionListener(this);
+        mCustomVideoView.setOnTouchListener(this);
+        mCustomVideoView.setMediaPlayerStateChangedListener(this);
+        mScreenStateListener = new ScreenStateListener(mCustomVideoView);
+        SurfaceHolder holder = mCustomVideoView.getHolder();
         holder.addCallback(this);
         close = (Button) mVideoOverlayLayout.findViewById(R.id.bClose);
         close.setOnClickListener(this);
@@ -65,9 +65,9 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         registerReceiver(mScreenStateListener, filter);
-        videoView.setVideoURI(fileRepo);
-        videoView.seekTo(position);
-        videoView.start();
+        mCustomVideoView.setVideoURI(fileRepo);
+        mCustomVideoView.seekTo(position);
+        mCustomVideoView.start();
     }
 
     @Override
@@ -133,8 +133,11 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
                 return true;
             case MotionEvent.ACTION_UP:
                 if (clicked) {
-                    togglePlayback(videoView);
-                    toggleCloseButtonVisibility();
+                    if (mCustomVideoView.isPlaying()) {
+                        mCustomVideoView.pause();
+                    } else {
+                        mCustomVideoView.start();
+                    }
                 }
                 return true;
         }
@@ -150,16 +153,20 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.bClose:
-                videoView.stopPlayback();
+                mCustomVideoView.stopPlayback();
                 destroyVideoSurface(mWindowManager, mVideoOverlayLayout);
         }
     }
 
-    private void toggleCloseButtonVisibility() {
-        if (videoView.isPlaying()) {
-            close.setVisibility(View.INVISIBLE);
-        } else {
-            close.setVisibility(View.VISIBLE);
+    @Override
+    public void onPlaybackStateChanged(int state) {
+        switch (state) {
+            case CustomVideoView.PLAYING:
+                close.setVisibility(View.GONE);
+                break;
+            case CustomVideoView.PAUSED:
+                close.setVisibility(View.VISIBLE);
+                break;
         }
     }
 }
