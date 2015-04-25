@@ -49,6 +49,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         mRotationButton.setOnClickListener(this);
         Bundle bundle = getIntent().getExtras();
         String videoPath = bundle.getString("videoUri");
+        int seekPosition = bundle.getInt("startPosition");
         mCustomVideoView = (CustomVideoView) findViewById(R.id.videoSurface);
         mCustomVideoView.setOnCompletionListener(this);
         mHelpers.setScreenBrightness(getWindow(), Screen.Brightness.HIGH);
@@ -56,6 +57,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         mediaController.setAnchorView(mCustomVideoView);
         mCustomVideoView.setMediaController(mediaController);
         mCustomVideoView.setVideoPath(videoPath);
+        mCustomVideoView.seekTo(seekPosition);
         mCustomVideoView.start();
     }
 
@@ -81,12 +83,13 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.overlayButton:
-                mCustomVideoView.pause();
                 VideoOverlay videoOverlay = new VideoOverlay(getApplicationContext());
                 videoOverlay.setVideoFile(mCustomVideoView.getVideoURI());
                 videoOverlay.setVideoStartPosition(mCustomVideoView.getCurrentPosition());
                 videoOverlay.setVideoHeight(mCustomVideoView.getVideoHeight());
                 videoOverlay.setVideoWidth(mCustomVideoView.getVideoWidth());
+                videoOverlay.setPlayOnStart(mCustomVideoView.isPlaying());
+                mCustomVideoView.pause();
                 videoOverlay.startPlayback();
                 mCustomVideoView.stopPlayback();
                 finish();

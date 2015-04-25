@@ -32,6 +32,7 @@ public class VideoOverlay extends RelativeLayout implements SurfaceHolder.Callba
     private ScreenStateListener mScreenStateListener = null;
     private double mVideoHeight = 0;
     private double mVideoWidth = 0;
+    private boolean playOnStart;
     private Helpers mHelpers = null;
     private Context mContext = null;
     private GestureDetectorCompat mDetector = null;
@@ -69,6 +70,10 @@ public class VideoOverlay extends RelativeLayout implements SurfaceHolder.Callba
         mVideoWidth = width;
     }
 
+    void setPlayOnStart(boolean start) {
+        playOnStart = start;
+    }
+
     void startPlayback() {
         createSystemOverlayForPreview(this);
     }
@@ -78,7 +83,10 @@ public class VideoOverlay extends RelativeLayout implements SurfaceHolder.Callba
         mContext.registerReceiver(mScreenStateListener, filter);
         mCustomVideoView.setVideoURI(fileRepo);
         mCustomVideoView.seekTo(position);
-        mCustomVideoView.start();
+        if (playOnStart) {
+            mCustomVideoView.start();
+        }
+
     }
 
     @Override
@@ -185,6 +193,14 @@ public class VideoOverlay extends RelativeLayout implements SurfaceHolder.Callba
                 mCustomVideoView.start();
             }
             return super.onSingleTapUp(e);
+        }
+
+        @Override
+        public void onLongPress(MotionEvent e) {
+            super.onLongPress(e);
+            mCustomVideoView.pause();
+            mHelpers.playVideoForLocation(fileRepo.getPath(), mCustomVideoView.getCurrentPosition());
+            mHelpers.destroyVideoSurface(mWindowManager, VideoOverlay.this);
         }
     }
 
