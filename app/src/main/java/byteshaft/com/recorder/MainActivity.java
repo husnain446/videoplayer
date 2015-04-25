@@ -29,7 +29,6 @@ import android.widget.TextView;
 import java.io.File;
 import java.util.ArrayList;
 
-
 public class MainActivity extends ActionBarActivity implements SearchView.OnQueryTextListener {
 
     private ArrayAdapter<String> mModeAdapter = null;
