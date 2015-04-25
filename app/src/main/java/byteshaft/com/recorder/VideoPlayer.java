@@ -129,7 +129,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
             mOverlayButton.setVisibility(INVISIBLE);
             mRotationButton.setVisibility(INVISIBLE);
         }
-
     }
 
     class GestureListener extends GestureDetector.SimpleOnGestureListener {
