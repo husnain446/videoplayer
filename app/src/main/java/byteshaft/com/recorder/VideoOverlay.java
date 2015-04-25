@@ -34,9 +34,10 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
     private double initialY = 0;
     private double initialTouchX = 0;
     private double initialTouchY = 0;
-    private int playerState;
     private double mVideoHeight = 0;
     private double mVideoWidth = 0;
+    private boolean playOnStart;
+
     public VideoOverlay(Context context) {
         super(context);
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -68,13 +69,12 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
         mVideoWidth = width;
     }
 
-    void startPlayback() {
-        createSystemOverlayForPreview(mVideoOverlayLayout);
+    void setPlayOnStart(boolean start) {
+        playOnStart = start;
     }
 
-    void currentPlayerState(int state) {   playerState = state; }
-    int getCurrentState() {
-        return playerState;
+    void startPlayback() {
+        createSystemOverlayForPreview(mVideoOverlayLayout);
     }
 
     @Override
@@ -82,11 +82,10 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
         registerReceiver(mScreenStateListener, filter);
         mCustomVideoView.setVideoURI(fileRepo);
         mCustomVideoView.seekTo(position);
-        if (getCurrentState() == 1) {
+        if (playOnStart) {
             mCustomVideoView.start();
-        } else {
-            return;
         }
+
     }
 
     @Override

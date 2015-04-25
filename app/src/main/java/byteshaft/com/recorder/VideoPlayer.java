@@ -158,17 +158,15 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.overlayButton:
-                customVideoView.pause();
                 VideoOverlay videoOverlay = new VideoOverlay(getApplicationContext());
                 videoOverlay.setVideoFile(customVideoView.getVideoURI());
                 videoOverlay.setVideoStartPosition(customVideoView.getCurrentPosition());
                 videoOverlay.setVideoHeight(customVideoView.getVideoHeight());
                 videoOverlay.setVideoWidth(customVideoView.getVideoWidth());
+                videoOverlay.setPlayOnStart(customVideoView.isPlaying());
+                customVideoView.pause();
                 videoOverlay.startPlayback();
                 finish();
-                if (!customVideoView.isPlaying()) {
-                    videoOverlay.currentPlayerState(0);
-                }
                 mHelpers.showLauncherHome();
                 break;
             case R.id.bRotate:
