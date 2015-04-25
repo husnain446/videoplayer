@@ -162,6 +162,8 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
                 VideoOverlay videoOverlay = new VideoOverlay(getApplicationContext());
                 videoOverlay.setVideoFile(customVideoView.getVideoURI());
                 videoOverlay.setVideoStartPosition(customVideoView.getCurrentPosition());
+                videoOverlay.setVideoHeight(customVideoView.getVideoHeight());
+                videoOverlay.setVideoWidth(customVideoView.getVideoWidth());
                 videoOverlay.startPlayback();
                 finish();
                 if (!customVideoView.isPlaying()) {

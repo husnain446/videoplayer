@@ -33,22 +33,13 @@ public class Helpers extends ContextWrapper {
         super(base);
     }
 
-    long getInt(double input) {
-        return Math.round(input);
-    }
-
-    long getDensityPixels(int pixels) {
-        float dp = TypedValue.applyDimension(
+    float getDensityPixels(int pixels) {
+        return TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP, pixels, getResources().getDisplayMetrics());
-        return getInt(dp);
     }
 
-    boolean isVideoPortrait(Bitmap bitmap) {
-        int videoHeight;
-        int videoWidth;
-        videoHeight = bitmap.getHeight();
-        videoWidth = bitmap.getWidth();
-        return videoHeight > videoWidth;
+    boolean isVideoPortrait(double height, double width) {
+        return height > width;
     }
 
     WindowManager getWindowManager() {
@@ -59,20 +50,6 @@ public class Helpers extends ContextWrapper {
         if (mWindowManager != null) {
             mWindowManager.removeView(view);
         }
-    }
-
-    double getVideoHeight(Bitmap bitmap) {
-        return (double) bitmap.getHeight();
-    }
-
-    double getVideoWidth(Bitmap bitmap) {
-        return (double) bitmap.getWidth();
-    }
-
-    Bitmap getMetadataForVideo(String file) {
-        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(file);
-        return retriever.getFrameAtTime();
     }
 
     ArrayList<String> getAllVideosUri() {
