@@ -1,8 +1,11 @@
 package byteshaft.com.recorder;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
+import android.support.v4.view.GestureDetectorCompat;
+import android.view.GestureDetector;
 import android.widget.MediaController;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -12,16 +15,16 @@ import android.widget.RelativeLayout;
 
 
 public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionListener,
-        Button.OnClickListener, View.OnTouchListener {
+        View.OnClickListener {
 
-
-    private String videoPath = null;
-    private CustomVideoView customVideoView = null;
-    private boolean clicked = false;
+    private CustomVideoView mCustomVideoView = null;
     private boolean isLandscape = true;
-    private float relevantMoveStep = 0;
-    private float initialTouchY = 0;
     private Helpers mHelpers = null;
+    private Button mOverlayButton = null;
+    private Button mRotationButton = null;
+    private GestureDetectorCompat mDetector = null;
+    private CustomMediaController mMediaController = null;
+    private RelativeLayout layout = null;
 
     private static class Screen {
         static class Brightness {
@@ -42,129 +45,54 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_player);
         mHelpers = new Helpers(getApplicationContext());
-        RelativeLayout layout = (RelativeLayout) findViewById(R.id.videoLayout);
-        final Button overlayButton = (Button) findViewById(R.id.overlayButton);
-        final Button rotationButton = (Button) findViewById(R.id.bRotate);
-        overlayButton.setOnClickListener(this);
-        rotationButton.setOnClickListener(this);
+        mDetector = new GestureDetectorCompat(this, new GestureListener());
+        layout = (RelativeLayout) findViewById(R.id.videoLayout);
+        mOverlayButton = (Button) findViewById(R.id.overlayButton);
+        mRotationButton = (Button) findViewById(R.id.bRotate);
+        mOverlayButton.setOnClickListener(this);
+        mRotationButton.setOnClickListener(this);
         Bundle bundle = getIntent().getExtras();
-        videoPath = bundle.getString("videoUri");
-        customVideoView = (CustomVideoView) findViewById(R.id.videoSurface);
-        customVideoView.setOnCompletionListener(this);
-        layout.setOnTouchListener(this);
+        String videoPath = bundle.getString("videoUri");
+        mCustomVideoView = (CustomVideoView) findViewById(R.id.videoSurface);
+        mCustomVideoView.setOnCompletionListener(this);
         mHelpers.setScreenBrightness(getWindow(), Screen.Brightness.HIGH);
-        MediaController mediaController = new MediaController(this) {
-            @Override
-            public void show() {
-                super.show();
-                overlayButton.setVisibility(VISIBLE);
-                rotationButton.setVisibility(VISIBLE);
-            }
-
-            @Override
-            public void hide() {
-                super.hide();
-                overlayButton.setVisibility(INVISIBLE);
-                rotationButton.setVisibility(INVISIBLE);
-            }
-        };
-        mediaController.setAnchorView(customVideoView);
-        customVideoView.setMediaController(mediaController);
-        customVideoView.setVideoPath(videoPath);
-        customVideoView.start();
+        mMediaController = new CustomMediaController(this);
+        mMediaController.setAnchorView(mCustomVideoView);
+        mCustomVideoView.setMediaController(mMediaController);
+        mCustomVideoView.setVideoPath(videoPath);
+        mCustomVideoView.start();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        customVideoView.pause();
+        mCustomVideoView.pause();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        customVideoView.stopPlayback();
+        mCustomVideoView.stopPlayback();
     }
 
     @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        final double BRIGHTNESS_STEP = 0.066;
-        final int VOLUME_STEP = 1;
-        final int ACTIVITY_HEIGHT_FRAGMENT = v.getHeight() / 50;
-
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                initialTouchY = event.getY();
-                clicked = true;
-                return true;
-            case MotionEvent.ACTION_MOVE:
-                float touchX = event.getX();
-                float touchY = event.getY();
-                // If action is on the left half of the View.
-                if (touchX < v.getWidth() / 2) {
-                    float brightness = mHelpers.getCurrentBrightness(getWindow());
-                    if (touchY > initialTouchY &&
-                            brightness - BRIGHTNESS_STEP > Screen.Brightness.LOW) {
-                        System.out.println("Going DOWN");
-                        relevantMoveStep = initialTouchY + ACTIVITY_HEIGHT_FRAGMENT;
-                        if (touchY >= relevantMoveStep) {
-                            brightness -= BRIGHTNESS_STEP;
-                            mHelpers.setScreenBrightness(getWindow(), brightness);
-                            initialTouchY = event.getY();
-                        }
-                    } else if (touchY < initialTouchY &&
-                            brightness + BRIGHTNESS_STEP <= Screen.Brightness.HIGH) {
-                        System.out.println("Going UP");
-                        relevantMoveStep = initialTouchY - ACTIVITY_HEIGHT_FRAGMENT;
-                        if (touchY <= relevantMoveStep) {
-                            brightness += BRIGHTNESS_STEP;
-                            mHelpers.setScreenBrightness(getWindow(), brightness);
-                            initialTouchY = event.getY();
-                        }
-                    }
-                } else {
-                    int volume = mHelpers.getCurrentVolume();
-                    if (touchY > initialTouchY &&
-                            volume - VOLUME_STEP >= Sound.Level.MINIMUM) {
-                        relevantMoveStep = initialTouchY + ACTIVITY_HEIGHT_FRAGMENT;
-                        if (touchY >= relevantMoveStep) {
-                            volume -= VOLUME_STEP;
-                            mHelpers.setVolume(volume);
-                            initialTouchY = event.getY();
-                        }
-                    } else if (touchY < initialTouchY &&
-                            volume + VOLUME_STEP <= Sound.Level.MAXIMUM) {
-                        relevantMoveStep = initialTouchY - ACTIVITY_HEIGHT_FRAGMENT;
-                        if (touchY <= relevantMoveStep) {
-                            volume += VOLUME_STEP;
-                            mHelpers.setVolume(volume);
-                            initialTouchY = event.getY();
-                        }
-                    }
-                }
-                if (touchY > initialTouchY + 10) {
-                    clicked = false;
-                } else if (touchY < initialTouchY - 10) {
-                    clicked = false;
-                }
-                return true;
-            case MotionEvent.ACTION_UP:
-                return true;
-        }
-        return false;
+    public boolean onTouchEvent(MotionEvent event) {
+        this.mDetector.onTouchEvent(event);
+        return super.onTouchEvent(event);
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.overlayButton:
-                customVideoView.pause();
+                mCustomVideoView.pause();
                 VideoOverlay videoOverlay = new VideoOverlay(getApplicationContext());
-                videoOverlay.setVideoFile(customVideoView.getVideoURI());
-                videoOverlay.setVideoStartPosition(customVideoView.getCurrentPosition());
-                videoOverlay.setVideoHeight(customVideoView.getVideoHeight());
-                videoOverlay.setVideoWidth(customVideoView.getVideoWidth());
+                videoOverlay.setVideoFile(mCustomVideoView.getVideoURI());
+                videoOverlay.setVideoStartPosition(mCustomVideoView.getCurrentPosition());
+                videoOverlay.setVideoHeight(mCustomVideoView.getVideoHeight());
+                videoOverlay.setVideoWidth(mCustomVideoView.getVideoWidth());
                 videoOverlay.startPlayback();
+                mCustomVideoView.stopPlayback();
                 finish();
                 mHelpers.showLauncherHome();
                 break;
@@ -175,11 +103,90 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                 }
                 isLandscape = !isLandscape;
+                break;
         }
     }
 
     @Override
     public void onCompletion(MediaPlayer mp) {
         finish();
+    }
+
+    class CustomMediaController extends MediaController {
+
+        public CustomMediaController(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void show() {
+            super.show();
+            mOverlayButton.setVisibility(VISIBLE);
+            mRotationButton.setVisibility(VISIBLE);
+        }
+
+        @Override
+        public void hide() {
+            super.hide();
+            mOverlayButton.setVisibility(INVISIBLE);
+            mRotationButton.setVisibility(INVISIBLE);
+        }
+
+    }
+
+    class GestureListener extends GestureDetector.SimpleOnGestureListener {
+
+        final double BRIGHTNESS_STEP = 0.066;
+        final int VOLUME_STEP = 1;
+        private float lastTrackedPosition;
+
+        @Override
+        public boolean onDown(MotionEvent e) {
+            lastTrackedPosition = e.getY();
+            return super.onDown(e);
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            final int ACTIVITY_HEIGHT_FRAGMENT = getActivityHeight() / 50;
+            float touchX = e2.getX();
+            float touchY = e2.getY();
+            if (touchX < getActivityWidth() / 2) {
+                float brightness = mHelpers.getCurrentBrightness(getWindow());
+                if (touchY >= lastTrackedPosition + ACTIVITY_HEIGHT_FRAGMENT &&
+                        brightness - BRIGHTNESS_STEP > Screen.Brightness.LOW) {
+                    brightness -= BRIGHTNESS_STEP;
+                    mHelpers.setScreenBrightness(getWindow(), brightness);
+                    lastTrackedPosition = touchY;
+                } else if (touchY <= lastTrackedPosition - ACTIVITY_HEIGHT_FRAGMENT &&
+                        brightness + BRIGHTNESS_STEP <= Screen.Brightness.HIGH) {
+                    brightness += BRIGHTNESS_STEP;
+                    mHelpers.setScreenBrightness(getWindow(), brightness);
+                    lastTrackedPosition = touchY;
+                }
+            } else {
+                int currentVolume = mHelpers.getCurrentVolume();
+                if (touchY > lastTrackedPosition + ACTIVITY_HEIGHT_FRAGMENT &&
+                        currentVolume - VOLUME_STEP >= Sound.Level.MINIMUM) {
+                    currentVolume -= VOLUME_STEP;
+                    mHelpers.setVolume(currentVolume);
+                    lastTrackedPosition = touchY;
+                } else if (touchY <= lastTrackedPosition - ACTIVITY_HEIGHT_FRAGMENT &&
+                        currentVolume + VOLUME_STEP <= Sound.Level.MAXIMUM) {
+                    currentVolume += VOLUME_STEP;
+                    mHelpers.setVolume(currentVolume);
+                    lastTrackedPosition = touchY;
+                }
+            }
+            return super.onScroll(e1, e2, distanceX, distanceY);
+        }
+    }
+
+    private int getActivityHeight() {
+        return getWindow().getDecorView().getHeight();
+    }
+
+    private int getActivityWidth() {
+        return getWindow().getDecorView().getWidth();
     }
 }
