@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.RelativeLayout;
 
 
 public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionListener,
@@ -23,8 +22,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     private Button mOverlayButton = null;
     private Button mRotationButton = null;
     private GestureDetectorCompat mDetector = null;
-    private CustomMediaController mMediaController = null;
-    private RelativeLayout layout = null;
 
     private static class Screen {
         static class Brightness {
@@ -46,7 +43,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         setContentView(R.layout.activity_video_player);
         mHelpers = new Helpers(getApplicationContext());
         mDetector = new GestureDetectorCompat(this, new GestureListener());
-        layout = (RelativeLayout) findViewById(R.id.videoLayout);
         mOverlayButton = (Button) findViewById(R.id.overlayButton);
         mRotationButton = (Button) findViewById(R.id.bRotate);
         mOverlayButton.setOnClickListener(this);
@@ -56,9 +52,9 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         mCustomVideoView = (CustomVideoView) findViewById(R.id.videoSurface);
         mCustomVideoView.setOnCompletionListener(this);
         mHelpers.setScreenBrightness(getWindow(), Screen.Brightness.HIGH);
-        mMediaController = new CustomMediaController(this);
-        mMediaController.setAnchorView(mCustomVideoView);
-        mCustomVideoView.setMediaController(mMediaController);
+        CustomMediaController mediaController = new CustomMediaController(this);
+        mediaController.setAnchorView(mCustomVideoView);
+        mCustomVideoView.setMediaController(mediaController);
         mCustomVideoView.setVideoPath(videoPath);
         mCustomVideoView.start();
     }

@@ -8,15 +8,12 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.media.AudioManager;
-import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.VideoView;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -109,6 +106,7 @@ public class Helpers extends ContextWrapper {
         int id = cursor.getInt(idColumn);
         Uri uri = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id);
         getContentResolver().delete(uri, null, null);
+        cursor.close();
     }
 
     int getDurationForVideo(int databaseIndex) {
