@@ -7,16 +7,20 @@ import android.content.IntentFilter;
 import android.graphics.PixelFormat;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.support.v4.view.GestureDetectorCompat;
+import android.view.GestureDetector;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
-public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
-        View.OnTouchListener, MediaPlayer.OnCompletionListener, View.OnClickListener,
+public class VideoOverlay extends RelativeLayout implements SurfaceHolder.Callback,
+        MediaPlayer.OnCompletionListener, View.OnClickListener,
         CustomVideoView.MediaPlayerStateChangedListener {
 
     private final IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
@@ -24,31 +28,29 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
     private Uri fileRepo;
     private int position;
     private WindowManager.LayoutParams params;
-    private boolean clicked = false;
-    private View mVideoOverlayLayout;
     private Button close;
-    private CustomVideoView mCustomVideoView;
     private ScreenStateListener mScreenStateListener = null;
-    private double initialX = 0;
-    private double initialY = 0;
-    private double initialTouchX = 0;
-    private double initialTouchY = 0;
     private double mVideoHeight = 0;
     private double mVideoWidth = 0;
+    private Helpers mHelpers = null;
+    private Context mContext = null;
+    private GestureDetectorCompat mDetector = null;
+    private CustomVideoView mCustomVideoView = null;
 
     public VideoOverlay(Context context) {
         super(context);
-        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-        mVideoOverlayLayout = inflater.inflate(R.layout.video_surface, null);
-        mCustomVideoView = (CustomVideoView) mVideoOverlayLayout.findViewById(R.id.videoView);
+        mContext = context;
+        mHelpers = new Helpers(mContext);
+        mCustomVideoView = new CustomVideoView(mContext);
+        close = getCloseButton();
+        addView(mCustomVideoView);
+        addView(close);
         mCustomVideoView.setOnCompletionListener(this);
-        mCustomVideoView.setOnTouchListener(this);
         mCustomVideoView.setMediaPlayerStateChangedListener(this);
         mScreenStateListener = new ScreenStateListener(mCustomVideoView);
         SurfaceHolder holder = mCustomVideoView.getHolder();
         holder.addCallback(this);
-        close = (Button) mVideoOverlayLayout.findViewById(R.id.bClose);
-        close.setOnClickListener(this);
+        mDetector = new GestureDetectorCompat(mContext, new GestureListener());
     }
 
     void setVideoFile(Uri uri) {
@@ -68,12 +70,12 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
     }
 
     void startPlayback() {
-        createSystemOverlayForPreview(mVideoOverlayLayout);
+        createSystemOverlayForPreview(this);
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        registerReceiver(mScreenStateListener, filter);
+        mContext.registerReceiver(mScreenStateListener, filter);
         mCustomVideoView.setVideoURI(fileRepo);
         mCustomVideoView.seekTo(position);
         mCustomVideoView.start();
@@ -86,12 +88,12 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        unregisterReceiver(mScreenStateListener);
+        mContext.unregisterReceiver(mScreenStateListener);
 
     }
 
     private void createSystemOverlayForPreview(View previewForCamera) {
-        mWindowManager = getWindowManager();
+        mWindowManager = mHelpers.getWindowManager();
         params = getCustomWindowManagerParameters();
         mWindowManager.addView(previewForCamera, params);
     }
@@ -100,12 +102,12 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
         double height;
         double width;
         double ratio;
-        if (isVideoPortrait(mVideoHeight, mVideoWidth)) {
-            width = getDensityPixels(150);
+        if (mHelpers.isVideoPortrait(mVideoHeight, mVideoWidth)) {
+            width = mHelpers.getDensityPixels(150);
             ratio = mVideoHeight / mVideoWidth;
             height = width * ratio;
         } else {
-            height = getDensityPixels(150);
+            height = mHelpers.getDensityPixels(150);
             ratio = mVideoWidth / mVideoHeight;
             width = height * ratio;
         }
@@ -113,48 +115,21 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
         params.height = (int) height;
         params.width = (int) width;
         params.type = WindowManager.LayoutParams.TYPE_PHONE;
-        params.flags = WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS |
-                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
-        params.format = PixelFormat.RGBA_8888;
+        params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        params.format = PixelFormat.TRANSLUCENT;
         params.gravity = Gravity.TOP | Gravity.START;
         return params;
     }
 
     @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                initialTouchX = event.getRawX();
-                initialTouchY = event.getRawY();
-                initialX = params.x;
-                initialY = params.y;
-                clicked = true;
-                return true;
-            case MotionEvent.ACTION_MOVE:
-                if (event.getRawX() > initialX + 10 || event.getRawX() < initialX - 10 ||
-                        event.getRawY() > initialY + 10 || event.getRawY() < initialY - 10) {
-                    params.x = (int) initialX + (int) (event.getRawX() - initialTouchX);
-                    params.y = (int) initialY + (int) (event.getRawY() - initialTouchY);
-                    mWindowManager.updateViewLayout(mVideoOverlayLayout, params);
-                    clicked = false;
-                }
-                return true;
-            case MotionEvent.ACTION_UP:
-                if (clicked) {
-                    if (mCustomVideoView.isPlaying()) {
-                        mCustomVideoView.pause();
-                    } else {
-                        mCustomVideoView.start();
-                    }
-                }
-                return true;
-        }
-        return false;
+    public boolean onTouchEvent(@NonNull MotionEvent event) {
+        this.mDetector.onTouchEvent(event);
+        return super.onTouchEvent(event);
     }
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        destroyVideoSurface(mWindowManager, mVideoOverlayLayout);
+        mHelpers.destroyVideoSurface(mWindowManager, this);
     }
 
     @Override
@@ -162,7 +137,7 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
         switch (v.getId()) {
             case R.id.bClose:
                 mCustomVideoView.stopPlayback();
-                destroyVideoSurface(mWindowManager, mVideoOverlayLayout);
+                mHelpers.destroyVideoSurface(mWindowManager, this);
         }
     }
 
@@ -176,5 +151,58 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
                 close.setVisibility(View.VISIBLE);
                 break;
         }
+    }
+
+    class GestureListener extends GestureDetector.SimpleOnGestureListener {
+
+        private int initialX = 0;
+        private int initialY = 0;
+        private float initialTouchX = 0;
+        private float initialTouchY = 0;
+
+        @Override
+        public boolean onDown(MotionEvent e) {
+            initialX = params.x;
+            initialY = params.y;
+            initialTouchX = e.getRawX();
+            initialTouchY = e.getRawY();
+            return super.onDown(e);
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            params.x = initialX + (int) (e2.getRawX() - initialTouchX);
+            params.y = initialY + (int) (e2.getRawY() - initialTouchY);
+            mWindowManager.updateViewLayout(VideoOverlay.this, params);
+            return super.onScroll(e1, e2, distanceX, distanceY);
+        }
+
+        @Override
+        public boolean onSingleTapUp(MotionEvent e) {
+            if (mCustomVideoView.isPlaying()) {
+                mCustomVideoView.pause();
+            } else {
+                mCustomVideoView.start();
+            }
+            return super.onSingleTapUp(e);
+        }
+    }
+
+    private LinearLayout.LayoutParams getLayoutParametersForCloseButton() {
+        int height = Math.round(mHelpers.getDensityPixels(40));
+        int width = Math.round(mHelpers.getDensityPixels(40));
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(width, height);
+        layoutParams.gravity = Gravity.TOP | Gravity.END;
+        return layoutParams;
+    }
+
+    private Button getCloseButton() {
+        Button button = new Button(mContext);
+        button.setText("X");
+        button.setLayoutParams(getLayoutParametersForCloseButton());
+        button.setOnClickListener(this);
+        button.setId(R.id.bClose);
+        button.setVisibility(INVISIBLE);
+        return button;
     }
 }
