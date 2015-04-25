@@ -172,7 +172,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         String menuItemName = menuItems[menuItemIndex];
         String listItemName = mVideosPathList.get(info.position);
         if (menuItemName.equals("Play")) {
-            mHelper.playVideoForLocation(listItemName);
+            mHelper.playVideoForLocation(listItemName, 0);
         } else if (menuItemName.equals("Delete")) {
             showDeleteConfirmationDialog(info.position);
         }
@@ -198,7 +198,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         @Override
         public void onListItemClick(ListView l, View v, int position, long id) {
             super.onListItemClick(l, v, position, id);
-            mHelper.playVideoForLocation(mVideosPathList.get(position));
+            mHelper.playVideoForLocation(mVideosPathList.get(position), 0);
         }
 
         @Override

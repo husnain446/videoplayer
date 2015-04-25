@@ -186,6 +186,14 @@ public class VideoOverlay extends RelativeLayout implements SurfaceHolder.Callba
             }
             return super.onSingleTapUp(e);
         }
+
+        @Override
+        public void onLongPress(MotionEvent e) {
+            super.onLongPress(e);
+            mCustomVideoView.pause();
+            mHelpers.playVideoForLocation(fileRepo.getPath(), mCustomVideoView.getCurrentPosition());
+            mHelpers.destroyVideoSurface(mWindowManager, VideoOverlay.this);
+        }
     }
 
     private LinearLayout.LayoutParams getLayoutParametersForCloseButton() {
