@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -34,6 +35,8 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
     private double initialY = 0;
     private double initialTouchX = 0;
     private double initialTouchY = 0;
+    private int playerState;
+
 
     public VideoOverlay(Context context) {
         super(context);
@@ -62,12 +65,21 @@ public class VideoOverlay extends Helpers implements SurfaceHolder.Callback,
         createSystemOverlayForPreview(mVideoOverlayLayout);
     }
 
+    void currentPlayerState(int state) {   playerState = state; }
+    int getCurrentState() {
+        return playerState;
+    }
+
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         registerReceiver(mScreenStateListener, filter);
         mCustomVideoView.setVideoURI(fileRepo);
         mCustomVideoView.seekTo(position);
-        mCustomVideoView.start();
+        if (getCurrentState() == 1) {
+            mCustomVideoView.start();
+        } else {
+            return;
+        }
     }
 
     @Override

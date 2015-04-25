@@ -164,6 +164,9 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
                 videoOverlay.setVideoStartPosition(customVideoView.getCurrentPosition());
                 videoOverlay.startPlayback();
                 finish();
+                if (!customVideoView.isPlaying()) {
+                    videoOverlay.currentPlayerState(0);
+                }
                 mHelpers.showLauncherHome();
                 break;
             case R.id.bRotate:
