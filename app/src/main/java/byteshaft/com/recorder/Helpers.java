@@ -90,9 +90,10 @@ public class Helpers extends ContextWrapper {
         }
     }
 
-    void playVideoForLocation(String filename) {
+    void playVideoForLocation(String filename, int startPosition) {
         Intent intent = new Intent(getApplicationContext(), VideoPlayer.class);
         intent.putExtra("videoUri", filename);
+        intent.putExtra("startPosition", startPosition);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
     }
