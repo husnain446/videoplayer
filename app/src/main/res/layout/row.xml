@@ -13,8 +13,8 @@
 
         <ImageView
             android:id="@+id/Thumbnail"
-            android:layout_width="93dp"
-            android:layout_height="70dp"
+            android:layout_width="80dp"
+            android:layout_height="60dp"
             android:background="#000000"
             android:src="@drawable/abc_ratingbar_full_material"/>
 
