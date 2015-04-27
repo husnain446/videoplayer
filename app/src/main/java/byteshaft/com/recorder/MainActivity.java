@@ -59,10 +59,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         mDrawerList.setAdapter(new ArrayAdapter<>(this,
                 R.layout.drawer_list_item, mListTitles));
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
-        if (savedInstanceState == null) {
-            selectItem(0);
-        }
-
+        selectItem(0);
     }
 
     @Override
