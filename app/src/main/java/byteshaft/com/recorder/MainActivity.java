@@ -5,9 +5,13 @@ import android.app.Fragment;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.net.Uri;
 import android.app.ListFragment;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -27,7 +31,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.io.File;
 import java.util.ArrayList;
 
 public class MainActivity extends ActionBarActivity implements SearchView.OnQueryTextListener {
@@ -76,29 +79,24 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            View row = convertView;
-            if (row == null) {
+            ViewHolder holder;
+            if (convertView == null) {
                 LayoutInflater inflater = getLayoutInflater();
-                row = inflater.inflate(R.layout.row, parent, false);
-            }
-            TextView videoTitleListLabel = (TextView) row.findViewById(R.id.FilePath);
-            videoTitleListLabel.setText(mVideosTitles[position]);
-            TextView videoLengthLabel = (TextView) row.findViewById(R.id.tv);
-            videoLengthLabel.setText(
-                    mHelper.getFormattedTime(mHelper.getDurationForVideo(position)));
-            ImageView videoThumbnail = (ImageView) row.findViewById(R.id.Thumbnail);
-            File file = new File(mVideosPathList.get(position));
-            String fileName = String.valueOf(file.hashCode());
-            String filePath = getFilesDir().getAbsolutePath() + "/" + fileName;
-            Uri uri = Uri.parse(filePath);
-            File link = new File(uri.getPath());
-            if (link.exists()) {
-                videoThumbnail.setImageURI(uri);
+                convertView = inflater.inflate(R.layout.row, parent, false);
+                holder = new ViewHolder();
+                holder.title = (TextView) convertView.findViewById(R.id.FilePath);
+                holder.time = (TextView) convertView.findViewById(R.id.tv);
+                holder.thumbnail = (ImageView) convertView.findViewById(R.id.Thumbnail);
+                convertView.setTag(holder);
             } else {
-                new ThumbnailCreationTask(getApplicationContext(), videoThumbnail,
-                        mVideosPathList, position).execute();
+                holder = (ViewHolder) convertView.getTag();
             }
-            return row;
+            holder.title.setText(mVideosTitles[position]);
+            holder.time.setText(
+                    mHelper.getFormattedTime(mHelper.getDurationForVideo(position)));
+            holder.position = position;
+            new ThumbnailCreationTask(getApplicationContext(), holder, position).execute();
+            return convertView;
         }
     }
 
@@ -261,5 +259,46 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
                 invalidateOptionsMenu();
             }
         };
+    }
+
+    private static class ViewHolder {
+        public TextView title;
+        public TextView time;
+        public ImageView thumbnail;
+        public int position;
+    }
+
+    public class ThumbnailCreationTask extends AsyncTask<Void, Void, Bitmap> {
+
+        private Context mContext = null;
+        private int mPosition;
+        private ViewHolder mHolder;
+
+        public ThumbnailCreationTask(Context context, ViewHolder holder, int position) {
+            mContext = context;
+            mPosition = position;
+            mHolder = holder;
+        }
+
+        @Override
+        protected Bitmap doInBackground(Void... params) {
+            String[] projection = {MediaStore.Video.Media._ID};
+            Cursor cursor = mContext.getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                    projection, null, null, null);
+            int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
+            cursor.moveToPosition(mPosition);
+            int id = cursor.getInt(idColumn);
+            cursor.close();
+            return MediaStore.Video.Thumbnails.getThumbnail(
+                    mContext.getContentResolver(), id, MediaStore.Video.Thumbnails.MINI_KIND, null);
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+            if (mHolder.position == mPosition) {
+                mHolder.thumbnail.setImageBitmap(bitmap);
+            }
+        }
     }
 }
