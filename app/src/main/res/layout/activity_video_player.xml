@@ -16,6 +16,7 @@
     <Button
         android:id="@+id/overlayButton"
         android:background="@drawable/layout"
+
         android:layout_width="50dip"
         android:layout_height="40dip"
         android:visibility="invisible"
