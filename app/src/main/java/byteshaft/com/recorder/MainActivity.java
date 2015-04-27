@@ -1,5 +1,6 @@
 package byteshaft.com.recorder;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.SearchManager;
@@ -189,6 +190,9 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
                 break;
             case 1:
                 fragment = new SettingFragment();
+                break;
+            case 2:
+                fragment = new AboutFragment();
                 break;
         }
 
