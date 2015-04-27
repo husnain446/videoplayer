@@ -6,13 +6,7 @@ import android.app.Fragment;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.net.Uri;
-import android.app.ListFragment;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -34,7 +28,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class MainActivity extends ActionBarActivity implements SearchView.OnQueryTextListener {
+public class MainActivity extends ActionBarActivity implements SearchView.OnQueryTextListener,
+        VideosListFragment.VideosListListener {
 
     private ArrayAdapter<String> mModeAdapter = null;
     private ArrayList<String> mVideosPathList = null;
@@ -46,6 +41,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     private String[] mListTitles = {"Videos", "Settings", "About"};
     private DrawerLayout mDrawerLayout = null;
     private ActionBarDrawerToggle mDrawerToggle = null;
+    private Fragment fragment = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +66,17 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onVideoSelected(int position) {
+        mHelper.playVideoForLocation(mVideosPathList.get(position), 0);
+    }
+
+    @Override
+    public void onVideosListFragmentCreated() {
+        VideosListFragment videosListFragment = (VideosListFragment) fragment;
+        videosListFragment.setListAdapter(mModeAdapter);
     }
 
     class VideoListAdapter extends ArrayAdapter<String> {
@@ -168,30 +175,6 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         super.unregisterForContextMenu(view);
     }
 
-    public class VideosFragment extends ListFragment {
-
-        @Override
-        public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            setListAdapter(mModeAdapter);
-            return rootView;
-        }
-
-        @Override
-        public void onListItemClick(ListView l, View v, int position, long id) {
-            super.onListItemClick(l, v, position, id);
-            mHelper.playVideoForLocation(mVideosPathList.get(position), 0);
-        }
-
-        @Override
-        public void onActivityCreated(Bundle savedInstanceState) {
-            super.onActivityCreated(savedInstanceState);
-            getListView().setDivider(null);
-            registerForContextMenu(getListView());
-        }
-    }
-
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
 
         @Override
@@ -201,10 +184,9 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     }
 
     private void selectItem(int position) {
-        Fragment fragment = null;
         switch (position) {
             case 0:
-                fragment = new VideosFragment();
+                fragment = new VideosListFragment();
                 break;
             case 1:
                 fragment = new SettingFragment();
@@ -266,44 +248,10 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         };
     }
 
-    private static class ViewHolder {
+    static class ViewHolder {
         public TextView title;
         public TextView time;
         public ImageView thumbnail;
         public int position;
-    }
-
-    public class ThumbnailCreationTask extends AsyncTask<Void, Void, Bitmap> {
-
-        private Context mContext = null;
-        private int mPosition;
-        private ViewHolder mHolder;
-
-        public ThumbnailCreationTask(Context context, ViewHolder holder, int position) {
-            mContext = context;
-            mPosition = position;
-            mHolder = holder;
-        }
-
-        @Override
-        protected Bitmap doInBackground(Void... params) {
-            String[] projection = {MediaStore.Video.Media._ID};
-            Cursor cursor = mContext.getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-                    projection, null, null, null);
-            int idColumn = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID);
-            cursor.moveToPosition(mPosition);
-            int id = cursor.getInt(idColumn);
-            cursor.close();
-            return MediaStore.Video.Thumbnails.getThumbnail(
-                    mContext.getContentResolver(), id, MediaStore.Video.Thumbnails.MINI_KIND, null);
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            super.onPostExecute(bitmap);
-            if (mHolder.position == mPosition) {
-                mHolder.thumbnail.setImageBitmap(bitmap);
-            }
-        }
     }
 }
