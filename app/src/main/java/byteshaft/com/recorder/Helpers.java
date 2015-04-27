@@ -1,6 +1,5 @@
 package byteshaft.com.recorder;
 
-
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -22,9 +21,7 @@ import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.Locale;
 
-
 public class Helpers extends ContextWrapper {
-
 
     public Helpers(Context base) {
         super(base);

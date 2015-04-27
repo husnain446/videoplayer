@@ -1,13 +1,13 @@
 package byteshaft.com.recorder;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.net.Uri;
-import android.app.ListFragment;
+import android.support.annotation.NonNull;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -26,11 +26,10 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.io.File;
 import java.util.ArrayList;
 
-
-public class MainActivity extends ActionBarActivity implements SearchView.OnQueryTextListener {
+public class MainActivity extends ActionBarActivity implements SearchView.OnQueryTextListener,
+        VideosListFragment.VideosListListener {
 
     private ArrayAdapter<String> mModeAdapter = null;
     private ArrayList<String> mVideosPathList = null;
@@ -42,6 +41,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     private String[] mListTitles = {"Videos", "Settings", "About"};
     private DrawerLayout mDrawerLayout = null;
     private ActionBarDrawerToggle mDrawerToggle = null;
+    private Fragment fragment = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,23 +50,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mHelper = new Helpers(getApplicationContext());
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open,
-                R.string.drawer_close) {
-
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                getSupportActionBar().setTitle(mDrawerTitle);
-                invalidateOptionsMenu();
-            }
-
-            @Override
-            public void onDrawerClosed(View drawerView) {
-                super.onDrawerClosed(drawerView);
-                getSupportActionBar().setTitle(mTitle);
-                invalidateOptionsMenu();
-            }
-        };
+        mDrawerToggle = getActionBarDrawerToggle();
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mVideosPathList = mHelper.getAllVideosUri();
         mVideosTitles = mHelper.getVideoTitles(mVideosPathList);
@@ -84,6 +68,17 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         mDrawerToggle.syncState();
     }
 
+    @Override
+    public void onVideoSelected(int position) {
+        mHelper.playVideoForLocation(mVideosPathList.get(position), 0);
+    }
+
+    @Override
+    public void onVideosListFragmentCreated() {
+        VideosListFragment videosListFragment = (VideosListFragment) fragment;
+        videosListFragment.setListAdapter(mModeAdapter);
+    }
+
     class VideoListAdapter extends ArrayAdapter<String> {
 
         public VideoListAdapter(Context context, int resource, ArrayList<String> videos) {
@@ -92,29 +87,24 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            System.out.println(position);
-            View row = convertView;
-            if (row == null) {
+            ViewHolder holder;
+            if (convertView == null) {
                 LayoutInflater inflater = getLayoutInflater();
-                row = inflater.inflate(R.layout.row, parent, false);
-            }
-            TextView textFilePath = (TextView) row.findViewById(R.id.FilePath);
-            textFilePath.setText(mVideosTitles[position]);
-            TextView textView = (TextView) row.findViewById(R.id.tv);
-            textView.setText(mHelper.getFormattedTime(mHelper.getDurationForVideo(position)));
-            ImageView imageThumbnail = (ImageView) row.findViewById(R.id.Thumbnail);
-            File file = new File(mVideosPathList.get(position));
-            String name = String.valueOf(file.hashCode());
-            String filePath = getFilesDir().getAbsolutePath() + "/" + name;
-            Uri uri = Uri.parse(filePath);
-            File link = new File(uri.getPath());
-            if (link.exists()) {
-                imageThumbnail.setImageURI(uri);
+                convertView = inflater.inflate(R.layout.row, parent, false);
+                holder = new ViewHolder();
+                holder.title = (TextView) convertView.findViewById(R.id.FilePath);
+                holder.time = (TextView) convertView.findViewById(R.id.tv);
+                holder.thumbnail = (ImageView) convertView.findViewById(R.id.Thumbnail);
+                convertView.setTag(holder);
             } else {
-                new ThumbnailCreationTask(getApplicationContext(), imageThumbnail,
-                        mVideosPathList, position).execute();
+                holder = (ViewHolder) convertView.getTag();
             }
-            return row;
+            holder.title.setText(mVideosTitles[position]);
+            holder.time.setText(
+                    mHelper.getFormattedTime(mHelper.getDurationForVideo(position)));
+            holder.position = position;
+            new ThumbnailCreationTask(getApplicationContext(), holder, position).execute();
+            return convertView;
         }
     }
 
@@ -181,31 +171,8 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     }
 
     @Override
-    public void unregisterForContextMenu (View view){
+    public void unregisterForContextMenu (@NonNull View view){
         super.unregisterForContextMenu(view);
-    }
-
-    public class VideosFragment extends ListFragment {
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            setListAdapter(mModeAdapter);
-            return rootView;
-        }
-
-        @Override
-        public void onListItemClick(ListView l, View v, int position, long id) {
-            super.onListItemClick(l, v, position, id);
-            mHelper.playVideoForLocation(mVideosPathList.get(position), 0);
-        }
-
-        @Override
-        public void onActivityCreated(Bundle savedInstanceState) {
-            super.onActivityCreated(savedInstanceState);
-            registerForContextMenu(getListView());
-        }
     }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
@@ -217,13 +184,15 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     }
 
     private void selectItem(int position) {
-        Fragment fragment = null;
         switch (position) {
             case 0:
-                fragment = new VideosFragment();
+                fragment = new VideosListFragment();
                 break;
             case 1:
                 fragment = new SettingFragment();
+                break;
+            case 2:
+                fragment = new AboutFragment();
                 break;
         }
 
@@ -257,5 +226,32 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         });
         builder.create();
         builder.show();
+    }
+
+    private ActionBarDrawerToggle getActionBarDrawerToggle() {
+        return new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open,
+                R.string.drawer_close) {
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                getSupportActionBar().setTitle(mDrawerTitle);
+                invalidateOptionsMenu();
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+                getSupportActionBar().setTitle(mTitle);
+                invalidateOptionsMenu();
+            }
+        };
+    }
+
+    static class ViewHolder {
+        public TextView title;
+        public TextView time;
+        public ImageView thumbnail;
+        public int position;
     }
 }
