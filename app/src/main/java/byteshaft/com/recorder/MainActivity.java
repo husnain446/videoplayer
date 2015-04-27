@@ -186,6 +186,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         @Override
         public void onActivityCreated(Bundle savedInstanceState) {
             super.onActivityCreated(savedInstanceState);
+            getListView().setDivider(null);
             registerForContextMenu(getListView());
         }
     }
