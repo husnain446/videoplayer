@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.widget.TextView;
 
-
 public class SearchResultsActivity extends ActionBarActivity {
     private TextView txtQuery;
 

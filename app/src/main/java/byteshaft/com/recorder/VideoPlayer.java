@@ -12,7 +12,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 
-
 public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionListener,
         View.OnClickListener {
 
@@ -130,7 +129,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
             mOverlayButton.setVisibility(INVISIBLE);
             mRotationButton.setVisibility(INVISIBLE);
         }
-
     }
 
     class GestureListener extends GestureDetector.SimpleOnGestureListener {
