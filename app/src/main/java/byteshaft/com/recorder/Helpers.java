@@ -74,19 +74,6 @@ public class Helpers extends ContextWrapper {
         return vids.toArray(realVideos);
     }
 
-    void writeBitmapToFile(Bitmap bitmap, String fileName) {
-        FileOutputStream outputStream;
-        try {
-            outputStream = openFileOutput(fileName, Context.MODE_PRIVATE);
-            if (bitmap != null) {
-                bitmap.compress(Bitmap.CompressFormat.PNG, 85, outputStream);
-            }
-            outputStream.flush();
-            outputStream.close();
-        } catch (IOException ignored) {
-        }
-    }
-
     void playVideoForLocation(String filename, int startPosition) {
         Intent intent = new Intent(getApplicationContext(), VideoPlayer.class);
         intent.putExtra("videoUri", filename);
