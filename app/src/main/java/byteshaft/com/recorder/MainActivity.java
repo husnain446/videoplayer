@@ -1,6 +1,5 @@
 package byteshaft.com.recorder;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.SearchManager;
@@ -34,7 +33,6 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     private ArrayAdapter<String> mModeAdapter = null;
     private ArrayList<String> mVideosPathList = null;
     private String[] mVideosTitles = null;
-    private CharSequence mTitle = "Videos";
     private CharSequence mDrawerTitle = "Video Player";
     private Helpers mHelper = null;
     private ListView mDrawerList = null;
@@ -42,6 +40,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     private DrawerLayout mDrawerLayout = null;
     private ActionBarDrawerToggle mDrawerToggle = null;
     private Fragment fragment = null;
+    private int mPositionGlobal = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -179,6 +178,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            mPositionGlobal = position;
             selectItem(position);
         }
     }
@@ -242,7 +242,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
-                getSupportActionBar().setTitle(mTitle);
+                getSupportActionBar().setTitle(mListTitles[mPositionGlobal]);
                 invalidateOptionsMenu();
             }
         };
