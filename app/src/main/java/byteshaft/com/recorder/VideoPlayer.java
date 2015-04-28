@@ -15,12 +15,12 @@ import android.widget.Button;
 public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionListener,
         View.OnClickListener {
 
-    private CustomVideoView mCustomVideoView = null;
+    private CustomVideoView mCustomVideoView;
     private boolean isLandscape = true;
-    private Helpers mHelpers = null;
-    private Button mOverlayButton = null;
-    private Button mRotationButton = null;
-    private GestureDetectorCompat mDetector = null;
+    private Helpers mHelpers;
+    private Button mOverlayButton;
+    private Button mRotationButton;
+    private GestureDetectorCompat mDetector;
 
     private static class Screen {
         static class Brightness {

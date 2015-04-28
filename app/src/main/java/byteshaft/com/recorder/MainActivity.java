@@ -30,17 +30,17 @@ import java.util.ArrayList;
 public class MainActivity extends ActionBarActivity implements SearchView.OnQueryTextListener,
         VideosListFragment.VideosListListener {
 
-    private ArrayAdapter<String> mModeAdapter = null;
-    private ArrayList<String> mVideosPathList = null;
-    private String[] mVideosTitles = null;
+    private ArrayAdapter<String> mModeAdapter;
+    private ArrayList<String> mVideosPathList;
+    private String[] mVideosTitles;
     private CharSequence mDrawerTitle = "Video Player";
-    private Helpers mHelper = null;
-    private ListView mDrawerList = null;
+    private Helpers mHelper;
+    private ListView mDrawerList;
     private String[] mListTitles = {"Videos", "Settings", "About"};
-    private DrawerLayout mDrawerLayout = null;
-    private ActionBarDrawerToggle mDrawerToggle = null;
-    private Fragment fragment = null;
-    private int mPositionGlobal = 0;
+    private DrawerLayout mDrawerLayout;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private Fragment mFragment;
+    private int mPositionGlobal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +74,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
 
     @Override
     public void onVideosListFragmentCreated() {
-        VideosListFragment videosListFragment = (VideosListFragment) fragment;
+        VideosListFragment videosListFragment = (VideosListFragment) mFragment;
         videosListFragment.setListAdapter(mModeAdapter);
     }
 
@@ -186,19 +186,19 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     private void selectItem(int position) {
         switch (position) {
             case 0:
-                fragment = new VideosListFragment();
+                mFragment = new VideosListFragment();
                 break;
             case 1:
-                fragment = new SettingFragment();
+                mFragment = new SettingFragment();
                 break;
             case 2:
-                fragment = new AboutFragment();
+                mFragment = new AboutFragment();
                 break;
         }
 
         // Insert the fragment by replacing any existing fragment
         android.app.FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
+        fragmentManager.beginTransaction().replace(R.id.container, mFragment).commit();
 
         // Highlight the selected item, update the title, and close the drawer
         mDrawerList.setItemChecked(position, true);

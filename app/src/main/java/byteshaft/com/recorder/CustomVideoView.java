@@ -13,10 +13,10 @@ public class CustomVideoView extends VideoView implements MediaPlayer.OnPrepared
     static final int PLAYING = 1;
     static final int PAUSED = 0;
 
-    private Uri currentlyPlayingVideoUri = null;
+    private Uri mCurrentlyPlayingVideoUri;
     private ArrayList<MediaPlayerStateChangedListener> mListeners = new ArrayList<>();
-    private int mVideoHeight = 0;
-    private int mVideoWidth = 0;
+    private int mVideoHeight;
+    private int mVideoWidth;
 
     public CustomVideoView(Context context) {
         super(context);
@@ -53,17 +53,17 @@ public class CustomVideoView extends VideoView implements MediaPlayer.OnPrepared
     @Override
     public void stopPlayback() {
         super.stopPlayback();
-        currentlyPlayingVideoUri = null;
+        mCurrentlyPlayingVideoUri = null;
     }
 
     @Override
     public void setVideoURI(Uri uri) {
         super.setVideoURI(uri);
-        currentlyPlayingVideoUri = uri;
+        mCurrentlyPlayingVideoUri = uri;
     }
 
     public Uri getVideoURI() {
-        return currentlyPlayingVideoUri;
+        return mCurrentlyPlayingVideoUri;
     }
 
     @Override
