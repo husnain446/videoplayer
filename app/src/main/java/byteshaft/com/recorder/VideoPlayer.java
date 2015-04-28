@@ -3,7 +3,6 @@ package byteshaft.com.recorder;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.support.v4.view.GestureDetectorCompat;
 import android.view.GestureDetector;

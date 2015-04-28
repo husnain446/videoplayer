@@ -1,6 +1,6 @@
 package byteshaft.com.recorder;
 
-import android.app.Activity;
+
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.SearchManager;
@@ -28,7 +28,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class MainActivity extends ActionBarActivity implements SearchView.OnQueryTextListener,
+public class MainActivity extends ActionBarActivity implements SearchView.OnQueryTextListener ,
         VideosListFragment.VideosListListener {
 
     private ArrayAdapter<String> mModeAdapter = null;
@@ -42,6 +42,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     private DrawerLayout mDrawerLayout = null;
     private ActionBarDrawerToggle mDrawerToggle = null;
     private Fragment fragment = null;
+    SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,7 +115,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
         MenuItem searchItem = menu.findItem(R.id.search);
-        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView = (SearchView) searchItem.getActionView();
         if (searchView != null) {
             searchView.setSearchableInfo(manager.getSearchableInfo(getComponentName()));
             searchView.setOnQueryTextListener(this);
@@ -124,16 +125,23 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
 
     @Override
     public boolean onQueryTextSubmit(String query) {
+        mModeAdapter.getFilter().filter(query);
         return true;
     }
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        if (TextUtils.isEmpty(newText)) {
-            mModeAdapter.getFilter().filter("");
-        } else {
-            mModeAdapter.getFilter().filter(newText);
-        }
+        System.out.println("change");
+        System.out.println(newText);
+        setSearch();
+
+
+
+//        if (TextUtils.isEmpty(newText)) {
+//            mModeAdapter.getFilter().filter("");
+//        } else {
+//            mModeAdapter.getFilter().filter(newText);
+//        }
         return true;
     }
 
@@ -247,6 +255,17 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
             }
         };
     }
+
+    private void setSearch() {
+        CharSequence search = searchView.getQuery();
+        System.out.println(search);
+        for (int i = 0 ; i <= mVideosTitles.length; i++) {
+                System.out.println("looping");
+
+        }
+    }
+
+
 
     static class ViewHolder {
         public TextView title;
