@@ -8,7 +8,7 @@ import android.provider.MediaStore;
 
 public class ThumbnailCreationTask extends AsyncTask<Void, Void, Bitmap> {
 
-    private Context mContext = null;
+    private Context mContext;
     private int mPosition;
     private MainActivity.ViewHolder mHolder;
 

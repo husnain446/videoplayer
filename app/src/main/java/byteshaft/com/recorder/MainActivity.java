@@ -1,6 +1,5 @@
 package byteshaft.com.recorder;
 
-
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.SearchManager;
@@ -31,17 +30,17 @@ import java.util.ArrayList;
 public class MainActivity extends ActionBarActivity implements SearchView.OnQueryTextListener ,
         VideosListFragment.VideosListListener {
 
-    private ArrayAdapter<String> mModeAdapter = null;
-    private ArrayList<String> mVideosPathList = null;
-    private String[] mVideosTitles = null;
-    private CharSequence mTitle = "Videos";
+    private ArrayAdapter<String> mModeAdapter;
+    private ArrayList<String> mVideosPathList;
+    private String[] mVideosTitles;
     private CharSequence mDrawerTitle = "Video Player";
-    private Helpers mHelper = null;
-    private ListView mDrawerList = null;
+    private Helpers mHelper;
+    private ListView mDrawerList;
     private String[] mListTitles = {"Videos", "Settings", "About"};
-    private DrawerLayout mDrawerLayout = null;
-    private ActionBarDrawerToggle mDrawerToggle = null;
-    private Fragment fragment = null;
+    private DrawerLayout mDrawerLayout;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private Fragment mFragment;
+    private int mPositionGlobal;
     SearchView searchView;
 
     @Override
@@ -76,7 +75,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
 
     @Override
     public void onVideosListFragmentCreated() {
-        VideosListFragment videosListFragment = (VideosListFragment) fragment;
+        VideosListFragment videosListFragment = (VideosListFragment) mFragment;
         videosListFragment.setListAdapter(mModeAdapter);
     }
 
@@ -187,6 +186,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
 
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            mPositionGlobal = position;
             selectItem(position);
         }
     }
@@ -194,19 +194,19 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     private void selectItem(int position) {
         switch (position) {
             case 0:
-                fragment = new VideosListFragment();
+                mFragment = new VideosListFragment();
                 break;
             case 1:
-                fragment = new SettingFragment();
+                mFragment = new SettingFragment();
                 break;
             case 2:
-                fragment = new AboutFragment();
+                mFragment = new AboutFragment();
                 break;
         }
 
         // Insert the fragment by replacing any existing fragment
         android.app.FragmentManager fragmentManager = getFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.container, fragment).commit();
+        fragmentManager.beginTransaction().replace(R.id.container, mFragment).commit();
 
         // Highlight the selected item, update the title, and close the drawer
         mDrawerList.setItemChecked(position, true);
@@ -250,7 +250,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
-                getSupportActionBar().setTitle(mTitle);
+                getSupportActionBar().setTitle(mListTitles[mPositionGlobal]);
                 invalidateOptionsMenu();
             }
         };

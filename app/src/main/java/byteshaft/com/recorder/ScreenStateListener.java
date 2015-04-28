@@ -23,7 +23,7 @@ import android.widget.VideoView;
 
 public class ScreenStateListener extends BroadcastReceiver {
 
-    private VideoView mVideoView = null;
+    private VideoView mVideoView;
 
     public ScreenStateListener(VideoView videoView) {
         mVideoView = videoView;

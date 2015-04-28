@@ -11,7 +11,7 @@ import android.widget.ListView;
 
 public class VideosListFragment extends ListFragment {
 
-    private VideosListListener mCallback = null;
+    private VideosListListener mCallback;
 
     public interface VideosListListener {
         public void onVideoSelected(int position);
