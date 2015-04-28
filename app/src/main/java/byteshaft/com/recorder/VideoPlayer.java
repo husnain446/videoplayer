@@ -2,6 +2,8 @@ package byteshaft.com.recorder;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.support.v4.view.GestureDetectorCompat;
@@ -21,6 +23,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     private Button mOverlayButton;
     private Button mRotationButton;
     private GestureDetectorCompat mDetector;
+    private ScreenStateListener mScreenStateListener;
 
     private static class Screen {
         static class Brightness {
@@ -41,6 +44,8 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_player);
         mHelpers = new Helpers(getApplicationContext());
+        mScreenStateListener = new ScreenStateListener(mCustomVideoView);
+        final IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
         mDetector = new GestureDetectorCompat(this, new GestureListener());
         mOverlayButton = (Button) findViewById(R.id.overlayButton);
         mRotationButton = (Button) findViewById(R.id.bRotate);
@@ -55,6 +60,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         CustomMediaController mediaController = new CustomMediaController(this);
         mediaController.setAnchorView(mCustomVideoView);
         mCustomVideoView.setMediaController(mediaController);
+        registerReceiver(mScreenStateListener, filter);
         mCustomVideoView.setVideoPath(videoPath);
         mCustomVideoView.seekTo(seekPosition);
         mCustomVideoView.start();
@@ -64,6 +70,10 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     protected void onPause() {
         super.onPause();
         mCustomVideoView.pause();
+        try {
+            unregisterReceiver(mScreenStateListener);
+        } catch (IllegalArgumentException ignored) {
+        }
     }
 
     @Override
