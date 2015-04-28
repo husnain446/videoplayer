@@ -24,27 +24,27 @@ public class VideoOverlay extends RelativeLayout implements SurfaceHolder.Callba
 
     private final IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
     private WindowManager mWindowManager;
-    private Uri fileRepo;
-    private int position;
+    private Uri mFileRepo;
+    private int mPosition;
     private WindowManager.LayoutParams params;
-    private Button close;
-    private ScreenStateListener mScreenStateListener = null;
-    private double mVideoHeight = 0;
-    private double mVideoWidth = 0;
-    private boolean playOnStart;
-    private Helpers mHelpers = null;
-    private Context mContext = null;
-    private GestureDetectorCompat mDetector = null;
-    private CustomVideoView mCustomVideoView = null;
+    private Button mClose;
+    private ScreenStateListener mScreenStateListener;
+    private double mVideoHeight;
+    private double mVideoWidth;
+    private boolean mPlayOnStart;
+    private Helpers mHelpers;
+    private Context mContext;
+    private GestureDetectorCompat mDetector;
+    private CustomVideoView mCustomVideoView;
 
     public VideoOverlay(Context context) {
         super(context);
         mContext = context;
         mHelpers = new Helpers(mContext);
         mCustomVideoView = new CustomVideoView(mContext);
-        close = getCloseButton();
+        mClose = getCloseButton();
         addView(mCustomVideoView);
-        addView(close);
+        addView(mClose);
         mCustomVideoView.setOnCompletionListener(this);
         mCustomVideoView.setMediaPlayerStateChangedListener(this);
         mScreenStateListener = new ScreenStateListener(mCustomVideoView);
@@ -54,11 +54,11 @@ public class VideoOverlay extends RelativeLayout implements SurfaceHolder.Callba
     }
 
     void setVideoFile(Uri uri) {
-        fileRepo = uri;
+        mFileRepo = uri;
     }
 
     void setVideoStartPosition(int position) {
-        this.position = position;
+        this.mPosition = position;
     }
 
     void setVideoHeight(int height) {
@@ -70,7 +70,7 @@ public class VideoOverlay extends RelativeLayout implements SurfaceHolder.Callba
     }
 
     void setPlayOnStart(boolean start) {
-        playOnStart = start;
+        mPlayOnStart = start;
     }
 
     void startPlayback() {
@@ -80,9 +80,9 @@ public class VideoOverlay extends RelativeLayout implements SurfaceHolder.Callba
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         mContext.registerReceiver(mScreenStateListener, filter);
-        mCustomVideoView.setVideoURI(fileRepo);
-        mCustomVideoView.seekTo(position);
-        if (playOnStart) {
+        mCustomVideoView.setVideoURI(mFileRepo);
+        mCustomVideoView.seekTo(mPosition);
+        if (mPlayOnStart) {
             mCustomVideoView.start();
         }
 
@@ -152,10 +152,10 @@ public class VideoOverlay extends RelativeLayout implements SurfaceHolder.Callba
     public void onPlaybackStateChanged(int state) {
         switch (state) {
             case CustomVideoView.PLAYING:
-                close.setVisibility(View.GONE);
+                mClose.setVisibility(View.GONE);
                 break;
             case CustomVideoView.PAUSED:
-                close.setVisibility(View.VISIBLE);
+                mClose.setVisibility(View.VISIBLE);
                 break;
         }
     }
@@ -198,7 +198,7 @@ public class VideoOverlay extends RelativeLayout implements SurfaceHolder.Callba
         public void onLongPress(MotionEvent e) {
             super.onLongPress(e);
             mCustomVideoView.pause();
-            mHelpers.playVideoForLocation(fileRepo.getPath(), mCustomVideoView.getCurrentPosition());
+            mHelpers.playVideoForLocation(mFileRepo.getPath(), mCustomVideoView.getCurrentPosition());
             mHelpers.destroyVideoSurface(mWindowManager, VideoOverlay.this);
         }
     }
