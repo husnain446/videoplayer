@@ -5,6 +5,10 @@ import android.app.Fragment;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.DrawerLayout;
@@ -12,6 +16,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
+import android.util.LruCache;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -46,6 +51,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        new BitmapCache();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mHelper = new Helpers(getApplicationContext());
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -102,7 +108,12 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
             holder.time.setText(
                     mHelper.getFormattedTime(mHelper.getDurationForVideo(position)));
             holder.position = position;
-            new ThumbnailCreationTask(getApplicationContext(), holder, position).execute();
+            if (BitmapCache.getBitmapFromMemCache(String.valueOf(position)) == null) {
+                holder.thumbnail.setImageURI(null);
+                new ThumbnailCreationTask(getApplicationContext(), holder, position).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            } else {
+                holder.thumbnail.setImageBitmap(BitmapCache.getBitmapFromMemCache(String.valueOf(position)));
+            }
             return convertView;
         }
     }
