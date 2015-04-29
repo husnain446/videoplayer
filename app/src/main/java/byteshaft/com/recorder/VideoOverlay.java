@@ -160,6 +160,11 @@ public class VideoOverlay extends RelativeLayout implements SurfaceHolder.Callba
         }
     }
 
+    @Override
+    public void onVideoViewPrepared() {
+
+    }
+
     class GestureListener extends GestureDetector.SimpleOnGestureListener {
 
         private int initialX = 0;
@@ -198,7 +203,8 @@ public class VideoOverlay extends RelativeLayout implements SurfaceHolder.Callba
         public void onLongPress(MotionEvent e) {
             super.onLongPress(e);
             mCustomVideoView.pause();
-            mHelpers.playVideoForLocation(mFileRepo.getPath(), mCustomVideoView.getCurrentPosition());
+            mHelpers.playVideoForLocation(mFileRepo.getPath(),
+                    mCustomVideoView.getCurrentPosition());
             mHelpers.destroyVideoSurface(mWindowManager, VideoOverlay.this);
         }
     }
