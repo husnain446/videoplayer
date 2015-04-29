@@ -76,12 +76,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         }
     }
 
-//    @Override
-//    protected void onStop() {
-//        super.onStop();
-//        mCustomVideoView.stopPlayback();
-//    }
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         this.mDetector.onTouchEvent(event);
