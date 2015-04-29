@@ -42,6 +42,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     private Fragment mFragment;
     private int mPositionGlobal;
     SearchView searchView;
+    ArrayAdapter<String> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,12 +131,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        System.out.println("change");
-        System.out.println(newText);
-        setSearch();
-
-
-
+        videoSearchFilter(newText);
 //        if (TextUtils.isEmpty(newText)) {
 //            mModeAdapter.getFilter().filter("");
 //        } else {
@@ -256,16 +252,17 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         };
     }
 
-    private void setSearch() {
-        CharSequence search = searchView.getQuery();
-        System.out.println(search);
-        for (int i = 0 ; i <= mVideosTitles.length; i++) {
-                System.out.println("looping");
-
-        }
+    private void videoSearchFilter(String search) {
+            if (search != null && search.length() > 0) {
+                for (int i = 0; i < mVideosTitles.length; i++) {
+                    if (!mVideosTitles[i].toLowerCase().contains(search)) {
+                        System.out.println(mVideosTitles[i]);
+                            mModeAdapter.remove(mModeAdapter.getItem(i));
+                            mModeAdapter.notifyDataSetChanged();
+                    }
+                }
+            }
     }
-
-
 
     static class ViewHolder {
         public TextView title;
