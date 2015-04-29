@@ -15,7 +15,7 @@ import android.view.View;
 import android.widget.Button;
 
 public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionListener,
-        View.OnClickListener {
+        View.OnClickListener, CustomVideoView.MediaPlayerStateChangedListener {
 
     private CustomVideoView mCustomVideoView;
     private boolean isLandscape = true;
@@ -55,6 +55,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         String videoPath = bundle.getString("videoUri");
         int seekPosition = bundle.getInt("startPosition");
         mCustomVideoView = (CustomVideoView) findViewById(R.id.videoSurface);
+        mCustomVideoView.setMediaPlayerStateChangedListener(this);
         mCustomVideoView.setOnCompletionListener(this);
         mHelpers.setScreenBrightness(getWindow(), Screen.Brightness.HIGH);
         CustomMediaController mediaController = new CustomMediaController(this);
@@ -112,6 +113,16 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     @Override
     public void onCompletion(MediaPlayer mp) {
         finish();
+    }
+
+    @Override
+    public void onPlaybackStateChanged(int state) {
+
+    }
+
+    @Override
+    public void onVideoViewPrepared() {
+        setVideoOrientation();
     }
 
     class CustomMediaController extends MediaController {
@@ -189,5 +200,14 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
 
     private int getActivityWidth() {
         return getWindow().getDecorView().getWidth();
+    }
+
+    private void setVideoOrientation() {
+        if (mHelpers.isVideoPortrait(mCustomVideoView.getVideoHeight(),
+                mCustomVideoView.getVideoWidth())) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        }
     }
 }
