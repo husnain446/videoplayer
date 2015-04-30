@@ -171,7 +171,6 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
             showDetailsDialog();
         }
         return super.onContextItemSelected(item);
-
     }
 
     private void showDetailsDialog() {
@@ -187,7 +186,6 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
             builder.create();
             builder.show();
     }
-
 
     @Override
     public void unregisterForContextMenu (@NonNull View view){
