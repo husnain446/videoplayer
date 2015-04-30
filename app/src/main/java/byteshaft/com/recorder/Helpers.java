@@ -14,7 +14,12 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Formatter;
 import java.util.Locale;
 
@@ -102,9 +107,62 @@ public class Helpers extends ContextWrapper {
         return Integer.valueOf(duration);
     }
 
+    String getResolutionForVideo(int databaseIndex) {
+        String[] projection = {MediaStore.Video.Media.RESOLUTION};
+        Cursor cursor = getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                projection, null, null, null);
+        int durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.VideoColumns.RESOLUTION);
+        cursor.moveToPosition(databaseIndex);
+        String resolution = cursor.getString(durationColumn);
+        cursor.close();
+        return resolution;
+    }
+
+    String getCreationDate(int databaseIndex) {
+        String[] projection = {MediaStore.Video.Media.DATE_TAKEN};
+        Cursor cursor = getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                projection, null, null, null);
+        int durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.VideoColumns.DATE_TAKEN);
+        cursor.moveToPosition(databaseIndex);
+        String dateTaken = cursor.getString(durationColumn);
+        String CreationDate = getDate(dateTaken , "dd-MM-yyy");
+        cursor.close();
+        return CreationDate;
+    }
+
+    String getVideoDescription(int databaseIndex) {
+        String[] projection = {MediaStore.Video.Media.DESCRIPTION};
+        Cursor cursor = getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                projection, null, null, null);
+        int durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.VideoColumns.DESCRIPTION);
+        cursor.moveToPosition(databaseIndex);
+        String dateTaken = cursor.getString(durationColumn);
+        String CreationDate = getDate(dateTaken , "dd-MM-yyy");
+        cursor.close();
+        return CreationDate;
+    }
+
+
+
+    public static String getDate(String milliSeconds, String dateFormat)
+    {
+        // Create a DateFormatter object for displaying date in specified format.
+        SimpleDateFormat formatter = new SimpleDateFormat(dateFormat);
+
+        // Create a calendar object that will convert the date and time value in milliseconds to date.
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(Long.parseLong(milliSeconds));
+        return formatter.format(calendar.getTime());
+    }
+
+
+
+
+
+
+
     String getFormattedTime(int timeMs) {
         int totalSeconds = timeMs / 1000;
-
         int seconds = totalSeconds % 60;
         int minutes = (totalSeconds / 60) % 60;
         int hours = totalSeconds / 3600;

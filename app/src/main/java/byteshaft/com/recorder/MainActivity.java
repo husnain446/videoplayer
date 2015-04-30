@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -31,6 +32,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class MainActivity extends ActionBarActivity implements SearchView.OnQueryTextListener ,
         VideosListFragment.VideosListListener {
@@ -48,6 +50,11 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     private int mPositionGlobal;
     SearchView searchView;
     VideosListFragment videosListFragment;
+    String mVideoResolution;
+    String mVideoDateCreated;
+    String mVideoDescription;
+    String length;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,7 +115,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
             }
             holder.title.setText(mVideosTitles[position]);
             holder.time.setText(
-                    mHelper.getFormattedTime(mHelper.getDurationForVideo(position)));
+                    mHelper.getFormattedTime((mHelper.getDurationForVideo(position))));
             holder.position = position;
             if (BitmapCache.getBitmapFromMemCache(String.valueOf(position)) == null) {
                 holder.thumbnail.setImageURI(null);
@@ -161,6 +168,9 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         super.onCreateContextMenu(menu, v, menuInfo);
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         menu.setHeaderTitle(mVideosTitles[info.position]);
+        mVideoResolution = mHelper.getResolutionForVideo(info.position);
+        mVideoDateCreated = mHelper.getCreationDate(info.position);
+//        mVideoDescription = mHelper.getVideoDescription(info.position);
         String[] menuItems = {"Play", "Delete" , "Details"};
         for (int i = 0; i < menuItems.length; i++) {
             menu.add(Menu.NONE, i, i, menuItems[i]);
@@ -191,7 +201,9 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     private void showDetailsDialog() {
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
             builder.setTitle("Details");
-            builder.setMessage("information");
+            builder.setMessage("Resolution:          " + mVideoResolution + "\n"
+                    + "Creation Date:     " + mVideoDateCreated +
+                    "\n" + "Description:         " + mVideoDescription);
             builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
