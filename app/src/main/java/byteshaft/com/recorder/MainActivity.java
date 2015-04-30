@@ -42,7 +42,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     private Fragment mFragment;
     private int mPositionGlobal;
     SearchView searchView;
-    ArrayAdapter<String> adapter;
+    VideosListFragment videosListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +76,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
 
     @Override
     public void onVideosListFragmentCreated() {
-        VideosListFragment videosListFragment = (VideosListFragment) mFragment;
+        videosListFragment = (VideosListFragment) mFragment;
         videosListFragment.setListAdapter(mModeAdapter);
     }
 
@@ -131,12 +131,11 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        videoSearchFilter(newText);
-//        if (TextUtils.isEmpty(newText)) {
-//            mModeAdapter.getFilter().filter("");
-//        } else {
-//            mModeAdapter.getFilter().filter(newText);
-//        }
+        if (TextUtils.isEmpty(newText)) {
+            mModeAdapter.getFilter().filter("");
+        } else {
+            mModeAdapter.getFilter().filter(newText);
+        }
         return true;
     }
 
@@ -151,7 +150,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         super.onCreateContextMenu(menu, v, menuInfo);
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         menu.setHeaderTitle(mVideosTitles[info.position]);
-        String[] menuItems = {"Play", "Delete"};
+        String[] menuItems = {"Play", "Delete" , "Details"};
         for (int i = 0; i < menuItems.length; i++) {
             menu.add(Menu.NONE, i, i, menuItems[i]);
         }
@@ -161,17 +160,38 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     public boolean onContextItemSelected (final MenuItem item){
         final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         int menuItemIndex = item.getItemId();
-        String[] menuItems = {"Play", "Delete"};
+        String[] menuItems = {"Play", "Delete" , "Details"};
         String menuItemName = menuItems[menuItemIndex];
         String listItemName = mVideosPathList.get(info.position);
         if (menuItemName.equals("Play")) {
             mHelper.playVideoForLocation(listItemName, 0);
         } else if (menuItemName.equals("Delete")) {
             showDeleteConfirmationDialog(info.position);
+        } else if (menuItemName.equals("Details")) {
+            showDetailsDialog(info.position);
         }
         return super.onContextItemSelected(item);
 
     }
+
+    private void showDetailsDialog(int position) {
+        if (position == 2) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setTitle("Details");
+            builder.setMessage("information");
+            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            builder.create();
+            builder.show();
+        }else {
+            return;
+        }
+    }
+
 
     @Override
     public void unregisterForContextMenu (@NonNull View view){
@@ -250,18 +270,6 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
                 invalidateOptionsMenu();
             }
         };
-    }
-
-    private void videoSearchFilter(String search) {
-            if (search != null && search.length() > 0) {
-                for (int i = 0; i < mVideosTitles.length; i++) {
-                    if (!mVideosTitles[i].toLowerCase().contains(search)) {
-                        System.out.println(mVideosTitles[i]);
-                            mModeAdapter.remove(mModeAdapter.getItem(i));
-                            mModeAdapter.notifyDataSetChanged();
-                    }
-                }
-            }
     }
 
     static class ViewHolder {
