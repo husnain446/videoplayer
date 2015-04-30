@@ -122,7 +122,8 @@ public class VideoOverlay extends RelativeLayout implements SurfaceHolder.Callba
         params.height = (int) height;
         params.width = (int) width;
         params.type = WindowManager.LayoutParams.TYPE_PHONE;
-        params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
         params.format = PixelFormat.TRANSLUCENT;
         params.gravity = Gravity.TOP | Gravity.START;
         return params;
@@ -158,6 +159,11 @@ public class VideoOverlay extends RelativeLayout implements SurfaceHolder.Callba
                 mClose.setVisibility(View.VISIBLE);
                 break;
         }
+    }
+
+    @Override
+    public void onVideoViewPrepared() {
+
     }
 
     class GestureListener extends GestureDetector.SimpleOnGestureListener {
@@ -198,7 +204,8 @@ public class VideoOverlay extends RelativeLayout implements SurfaceHolder.Callba
         public void onLongPress(MotionEvent e) {
             super.onLongPress(e);
             mCustomVideoView.pause();
-            mHelpers.playVideoForLocation(mFileRepo.getPath(), mCustomVideoView.getCurrentPosition());
+            mHelpers.playVideoForLocation(mFileRepo.getPath(),
+                    mCustomVideoView.getCurrentPosition());
             mHelpers.destroyVideoSurface(mWindowManager, VideoOverlay.this);
         }
     }
