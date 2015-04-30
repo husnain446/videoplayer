@@ -168,14 +168,13 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         } else if (menuItemName.equals("Delete")) {
             showDeleteConfirmationDialog(info.position);
         } else if (menuItemName.equals("Details")) {
-            showDetailsDialog(info.position);
+            showDetailsDialog();
         }
         return super.onContextItemSelected(item);
 
     }
 
-    private void showDetailsDialog(int position) {
-        if (position == 2) {
+    private void showDetailsDialog() {
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
             builder.setTitle("Details");
             builder.setMessage("information");
@@ -187,9 +186,6 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
             });
             builder.create();
             builder.show();
-        }else {
-            return;
-        }
     }
 
 
