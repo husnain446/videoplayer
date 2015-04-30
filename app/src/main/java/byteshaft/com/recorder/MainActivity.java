@@ -174,12 +174,16 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         String[] menuItems = {"Play", "Delete" , "Details"};
         String menuItemName = menuItems[menuItemIndex];
         String listItemName = mVideosPathList.get(info.position);
-        if (menuItemName.equals("Play")) {
-            mHelper.playVideoForLocation(listItemName, 0);
-        } else if (menuItemName.equals("Delete")) {
-            showDeleteConfirmationDialog(info.position);
-        } else if (menuItemName.equals("Details")) {
-            showDetailsDialog();
+        switch (menuItemName) {
+            case "Play":
+                mHelper.playVideoForLocation(listItemName, 0);
+                break;
+            case "Delete":
+                showDeleteConfirmationDialog(info.position);
+                break;
+            case "Details":
+                showDetailsDialog();
+                break;
         }
         return super.onContextItemSelected(item);
     }
