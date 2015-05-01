@@ -52,8 +52,12 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     VideosListFragment videosListFragment;
     String mVideoResolution;
     String mVideoDateCreated;
-    String mVideoDescription;
-    String length;
+    String mVideoAlbum;
+    String mVideoArtist;
+    String mVideoTitle;
+    String mData;
+    String mVideoCategory;
+
 
 
     @Override
@@ -170,7 +174,11 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         menu.setHeaderTitle(mVideosTitles[info.position]);
         mVideoResolution = mHelper.getResolutionForVideo(info.position);
         mVideoDateCreated = mHelper.getCreationDate(info.position);
-//        mVideoDescription = mHelper.getVideoDescription(info.position);
+        mVideoAlbum = mHelper.getVideoAlbumName(info.position);
+        mVideoArtist = mHelper.getArtist(info.position);
+        mVideoTitle = mHelper.getVideoTitle(info.position);
+        mData = mHelper.getLocation(info.position);
+        mVideoCategory = mHelper.getVideoCategory(info.position);
         String[] menuItems = {"Play", "Delete" , "Details"};
         for (int i = 0; i < menuItems.length; i++) {
             menu.add(Menu.NONE, i, i, menuItems[i]);
@@ -199,12 +207,27 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     }
 
     private void showDetailsDialog() {
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            builder.setTitle("Details");
-            builder.setMessage("Resolution:          " + mVideoResolution + "\n"
-                    + "Creation Date:     " + mVideoDateCreated +
-                    "\n" + "Description:         " + mVideoDescription);
-            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+        final String SPACE = "                    ";
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Details");
+        StringBuilder stringBuilder = new StringBuilder();
+        if (mVideoTitle != null) { stringBuilder.append("Name:").append("\n").append(SPACE)
+                .append(mVideoTitle).append("\n"); }
+        if (mVideoDateCreated != null) { stringBuilder.append("Date:").append("\n")
+                .append(SPACE).append(mVideoDateCreated).append("\n"); }
+        if (mVideoResolution != null) { stringBuilder.append("Resolution:").append("\n")
+                .append(SPACE).append(mVideoResolution).append("\n"); }
+        if (mVideoAlbum != null) { stringBuilder.append("Album:").append("\n")
+                .append(SPACE).append(mVideoAlbum).append("\n");  }
+        if (mVideoArtist != null) { stringBuilder.append("Artist:").append("\n")
+                .append(SPACE).append(mVideoArtist).append("\n"); }
+        if (mData != null) { stringBuilder.append("Location:").append("\n")
+                .append(SPACE).append(mData).append("\n"); }
+        if (mVideoCategory != null) { stringBuilder.append("Category:").append("\n")
+                .append(SPACE).append(mVideoCategory).append("\n"); }
+
+        builder.setMessage(stringBuilder);
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.dismiss();

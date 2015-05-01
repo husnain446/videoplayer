@@ -111,9 +111,9 @@ public class Helpers extends ContextWrapper {
         String[] projection = {MediaStore.Video.Media.RESOLUTION};
         Cursor cursor = getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
                 projection, null, null, null);
-        int durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.VideoColumns.RESOLUTION);
+        int resolutionColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.VideoColumns.RESOLUTION);
         cursor.moveToPosition(databaseIndex);
-        String resolution = cursor.getString(durationColumn);
+        String resolution = cursor.getString(resolutionColumn);
         cursor.close();
         return resolution;
     }
@@ -130,17 +130,70 @@ public class Helpers extends ContextWrapper {
         return CreationDate;
     }
 
-    String getVideoDescription(int databaseIndex) {
-        String[] projection = {MediaStore.Video.Media.DESCRIPTION};
+    String getVideoAlbumName(int databaseIndex) {
+        String[] projection = {MediaStore.Video.Media.ALBUM};
         Cursor cursor = getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
                 projection, null, null, null);
-        int durationColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.VideoColumns.DESCRIPTION);
+        int albumColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.VideoColumns.ALBUM);
         cursor.moveToPosition(databaseIndex);
-        String dateTaken = cursor.getString(durationColumn);
-        String CreationDate = getDate(dateTaken , "dd-MM-yyy");
+        String dateTaken = cursor.getString(albumColumn);
         cursor.close();
-        return CreationDate;
+        return dateTaken;
     }
+
+    String getArtist(int databaseIndex) {
+        String[] projection = {MediaStore.Video.Media.ARTIST};
+        Cursor cursor = getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                projection, null, null, null);
+        int artistColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.VideoColumns.ARTIST);
+        cursor.moveToPosition(databaseIndex);
+        String dateTaken = cursor.getString(artistColumn);
+        cursor.close();
+        return dateTaken;
+    }
+
+    String getVideoTitle(int databaseIndex) {
+        String[] projection = {MediaStore.Video.Media.TITLE};
+        Cursor cursor = getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                projection, null, null, null);
+        int titleColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.VideoColumns.TITLE);
+        cursor.moveToPosition(databaseIndex);
+        String title = cursor.getString(titleColumn);
+        cursor.close();
+        return title;
+    }
+
+    String getLocation(int databaseIndex) {
+        String[] projection = {MediaStore.Video.Media.DATA};
+        Cursor cursor = getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                projection, null, null, null);
+        int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.VideoColumns.DATA);
+        cursor.moveToPosition(databaseIndex);
+        String dateTaken = cursor.getString(dataColumn);
+        cursor.close();
+        return dateTaken;
+    }
+
+    String getVideoCategory(int databaseIndex) {
+        String[] projection = {MediaStore.Video.Media.CATEGORY};
+        Cursor cursor = getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                projection, null, null, null);
+        int categoryColumn = cursor.getColumnIndexOrThrow(MediaStore.Video.VideoColumns.CATEGORY);
+        cursor.moveToPosition(databaseIndex);
+        String dateTaken = cursor.getString(categoryColumn);
+        cursor.close();
+        return dateTaken;
+    }
+
+
+
+
+
+
+
+
+
+
 
 
 
