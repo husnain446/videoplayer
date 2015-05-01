@@ -9,7 +9,7 @@
 
     <byteshaft.com.recorder.CustomVideoView
         android:id="@+id/videoSurface"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_centerInParent="true"/>
 
