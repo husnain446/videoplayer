@@ -28,6 +28,12 @@ public class BitmapCache {
         }
     }
 
+    static void removeBitmapFromMemoryCache(String key) {
+        if (getBitmapFromMemCache(key) != null) {
+            mMemoryCache.remove(key);
+        }
+    }
+
     static Bitmap getBitmapFromMemCache(String key) {
         return mMemoryCache.get(key);
     }

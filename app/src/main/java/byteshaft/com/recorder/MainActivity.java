@@ -231,6 +231,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
             public void onClick(DialogInterface dialog, int which) {
                 mHelper.deleteFile(position);
                 mModeAdapter.remove(mModeAdapter.getItem(position));
+                BitmapCache.removeBitmapFromMemoryCache(String.valueOf(position));
                 mModeAdapter.notifyDataSetChanged();
             }
         });
