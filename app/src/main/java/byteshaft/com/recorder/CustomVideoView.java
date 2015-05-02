@@ -71,7 +71,7 @@ public class CustomVideoView extends VideoView implements MediaPlayer.OnPrepared
         mVideoHeight = mp.getVideoHeight();
         mVideoWidth = mp.getVideoWidth();
         for (MediaPlayerStateChangedListener listener : mListeners) {
-            listener.onVideoViewPrepared();
+            listener.onVideoViewPrepared(mp);
         }
 
     }
@@ -86,6 +86,6 @@ public class CustomVideoView extends VideoView implements MediaPlayer.OnPrepared
 
     public interface MediaPlayerStateChangedListener {
         public void onPlaybackStateChanged(int state);
-        public void onVideoViewPrepared();
+        public void onVideoViewPrepared(MediaPlayer mp);
     }
 }

@@ -121,7 +121,8 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     }
 
     @Override
-    public void onVideoViewPrepared() {
+    public void onVideoViewPrepared(MediaPlayer mp) {
+        mp.setLooping(true);
         setVideoOrientation();
     }
 
