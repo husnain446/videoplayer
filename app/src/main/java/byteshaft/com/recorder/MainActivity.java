@@ -25,6 +25,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -233,6 +234,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
                 mModeAdapter.remove(mModeAdapter.getItem(position));
                 BitmapCache.removeBitmapFromMemoryCache(String.valueOf(position));
                 mModeAdapter.notifyDataSetChanged();
+                Toast.makeText(getApplicationContext(),"file deleted",Toast.LENGTH_SHORT).show();
             }
         });
         builder.create();
