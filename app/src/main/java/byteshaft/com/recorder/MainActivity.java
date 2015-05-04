@@ -5,19 +5,14 @@ import android.app.Fragment;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.SearchView;
 import android.text.TextUtils;
-import android.util.LruCache;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -32,7 +27,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 public class MainActivity extends ActionBarActivity implements SearchView.OnQueryTextListener ,
         VideosListFragment.VideosListListener {
@@ -57,8 +51,6 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     String mVideoTitle;
     String mData;
     String mVideoCategory;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
