@@ -185,18 +185,6 @@ public class Helpers extends ContextWrapper {
         return dateTaken;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
     public static String getDate(String milliSeconds, String dateFormat)
     {
         // Create a DateFormatter object for displaying date in specified format.
@@ -207,12 +195,6 @@ public class Helpers extends ContextWrapper {
         calendar.setTimeInMillis(Long.parseLong(milliSeconds));
         return formatter.format(calendar.getTime());
     }
-
-
-
-
-
-
 
     String getFormattedTime(int timeMs) {
         int totalSeconds = timeMs / 1000;

@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -29,7 +28,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 public class MainActivity extends ActionBarActivity implements SearchView.OnQueryTextListener ,
         VideosListFragment.VideosListListener {
@@ -54,8 +52,6 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     String mVideoTitle;
     String mData;
     String mVideoCategory;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
