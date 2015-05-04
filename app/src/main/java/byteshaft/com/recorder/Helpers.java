@@ -4,9 +4,11 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.TypedValue;
 import android.view.View;
@@ -145,5 +147,15 @@ public class Helpers extends ContextWrapper {
     void setVolume(int level) {
         AudioManager am = (AudioManager) getSystemService(AUDIO_SERVICE);
         am.setStreamVolume(AudioManager.STREAM_MUSIC, level, 0);
+    }
+
+    boolean isCheckBoxEnabled() {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        return sharedPreferences.getBoolean("CheckBox", false);
+    }
+
+    void settingForCheckBox(boolean enable) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        sharedPreferences.edit().putBoolean("CheckBox", enable).apply();
     }
 }
