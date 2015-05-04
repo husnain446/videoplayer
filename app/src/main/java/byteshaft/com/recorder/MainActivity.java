@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -28,8 +29,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Date;
 
-public class MainActivity extends ActionBarActivity implements SearchView.OnQueryTextListener,
+public class MainActivity extends ActionBarActivity implements SearchView.OnQueryTextListener ,
         VideosListFragment.VideosListListener {
 
     private ArrayAdapter<String> mModeAdapter;
@@ -43,6 +45,17 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     private ActionBarDrawerToggle mDrawerToggle;
     private Fragment mFragment;
     private int mPositionGlobal;
+    SearchView searchView;
+    VideosListFragment videosListFragment;
+    String mVideoResolution;
+    String mVideoDateCreated;
+    String mVideoAlbum;
+    String mVideoArtist;
+    String mVideoTitle;
+    String mData;
+    String mVideoCategory;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +90,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
 
     @Override
     public void onVideosListFragmentCreated() {
-        VideosListFragment videosListFragment = (VideosListFragment) mFragment;
+        videosListFragment = (VideosListFragment) mFragment;
         videosListFragment.setListAdapter(mModeAdapter);
     }
 
@@ -103,7 +116,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
             }
             holder.title.setText(mVideosTitles[position]);
             holder.time.setText(
-                    mHelper.getFormattedTime(mHelper.getDurationForVideo(position)));
+                    mHelper.getFormattedTime((mHelper.getDurationForVideo(position))));
             holder.position = position;
             if (BitmapCache.getBitmapFromMemCache(String.valueOf(position)) == null) {
                 holder.thumbnail.setImageURI(null);
@@ -123,7 +136,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_main, menu);
         MenuItem searchItem = menu.findItem(R.id.search);
-        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView = (SearchView) searchItem.getActionView();
         if (searchView != null) {
             searchView.setSearchableInfo(manager.getSearchableInfo(getComponentName()));
             searchView.setOnQueryTextListener(this);
@@ -133,6 +146,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
 
     @Override
     public boolean onQueryTextSubmit(String query) {
+        mModeAdapter.getFilter().filter(query);
         return true;
     }
 
@@ -157,7 +171,14 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         super.onCreateContextMenu(menu, v, menuInfo);
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         menu.setHeaderTitle(mVideosTitles[info.position]);
-        String[] menuItems = {"Play", "Delete"};
+        mVideoResolution = mHelper.getResolutionForVideo(info.position);
+        mVideoDateCreated = mHelper.getCreationDate(info.position);
+        mVideoAlbum = mHelper.getVideoAlbumName(info.position);
+        mVideoArtist = mHelper.getArtist(info.position);
+        mVideoTitle = mHelper.getVideoTitle(info.position);
+        mData = mHelper.getLocation(info.position);
+        mVideoCategory = mHelper.getVideoCategory(info.position);
+        String[] menuItems = {"Play", "Delete" , "Details"};
         for (int i = 0; i < menuItems.length; i++) {
             menu.add(Menu.NONE, i, i, menuItems[i]);
         }
@@ -168,16 +189,52 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)
                 item.getMenuInfo();
         int menuItemIndex = item.getItemId();
-        String[] menuItems = {"Play", "Delete"};
+        String[] menuItems = {"Play", "Delete" , "Details"};
         String menuItemName = menuItems[menuItemIndex];
         String listItemName = mVideosPathList.get(info.position);
-        if (menuItemName.equals("Play")) {
-            mHelper.playVideoForLocation(listItemName, 0);
-        } else if (menuItemName.equals("Delete")) {
-            showDeleteConfirmationDialog(info.position);
+        switch (menuItemName) {
+            case "Play":
+                mHelper.playVideoForLocation(listItemName, 0);
+                break;
+            case "Delete":
+                showDeleteConfirmationDialog(info.position);
+                break;
+            case "Details":
+                showDetailsDialog();
+                break;
         }
         return super.onContextItemSelected(item);
+    }
 
+    private void showDetailsDialog() {
+        final String SPACE = "                    ";
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Details");
+        StringBuilder stringBuilder = new StringBuilder();
+        if (mVideoTitle != null) { stringBuilder.append("Name:").append("\n").append(SPACE)
+                .append(mVideoTitle).append("\n"); }
+        if (mVideoDateCreated != null) { stringBuilder.append("Date:").append("\n")
+                .append(SPACE).append(mVideoDateCreated).append("\n"); }
+        if (mVideoResolution != null) { stringBuilder.append("Resolution:").append("\n")
+                .append(SPACE).append(mVideoResolution).append("\n"); }
+        if (mVideoAlbum != null) { stringBuilder.append("Album:").append("\n")
+                .append(SPACE).append(mVideoAlbum).append("\n");  }
+        if (mVideoArtist != null) { stringBuilder.append("Artist:").append("\n")
+                .append(SPACE).append(mVideoArtist).append("\n"); }
+        if (mData != null) { stringBuilder.append("Location:").append("\n")
+                .append(SPACE).append(mData).append("\n"); }
+        if (mVideoCategory != null) { stringBuilder.append("Category:").append("\n")
+                .append(SPACE).append(mVideoCategory).append("\n"); }
+
+        builder.setMessage(stringBuilder);
+        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            builder.create();
+            builder.show();
     }
 
     @Override
