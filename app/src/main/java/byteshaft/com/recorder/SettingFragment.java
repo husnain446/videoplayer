@@ -9,17 +9,16 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
 public class SettingFragment extends Fragment implements CheckBox.OnCheckedChangeListener {
-    
     private Helpers mHelpers;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment, container, false);
-        CheckBox checkbox = (CheckBox) view.findViewById(R.id.ch);
-        checkbox.setOnCheckedChangeListener(this);
+        CheckBox repeatVideos = (CheckBox) view.findViewById(R.id.checkbox);
+        repeatVideos.setOnCheckedChangeListener(this);
         mHelpers = new Helpers(getActivity().getApplicationContext());
-        checkbox.setChecked(mHelpers.isCheckBoxEnabled());
+        repeatVideos.setChecked(mHelpers.isRepeatEnabled());
         return view;
     }
 
@@ -27,8 +26,8 @@ public class SettingFragment extends Fragment implements CheckBox.OnCheckedChang
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
         switch (buttonView.getId()) {
-            case R.id.ch:
-                mHelpers.settingForCheckBox(isChecked);
+            case R.id.checkbox:
+                mHelpers.setRepeatEnabled(isChecked);
                 break;
         }
     }
