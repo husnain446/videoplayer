@@ -8,7 +8,7 @@
  *  * http://www.gnu.org/licenses/lgpl-2.1.html 
  */
 
-package byteshaft.com.recorder;
+package com.byteshaft.videoplayer;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

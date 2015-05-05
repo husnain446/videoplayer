@@ -1,4 +1,4 @@
-package byteshaft.com.recorder;
+package com.byteshaft.videoplayer;
 
 import android.app.Fragment;
 import android.os.Bundle;
