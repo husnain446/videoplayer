@@ -14,6 +14,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 
+import java.util.Random;
+
 public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionListener,
         View.OnClickListener, CustomVideoView.MediaPlayerStateChangedListener {
 
@@ -112,7 +114,9 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        finish();
+        Random random = new Random();
+        mHelpers.playVideoForLocation(MainActivity.mVideosPathList.get(
+                random.nextInt(MainActivity.mVideosPathList.size())), 0);
     }
 
     @Override
@@ -122,7 +126,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
 
     @Override
     public void onVideoViewPrepared(MediaPlayer mp) {
-        mp.setLooping(true);
+//        mp.setLooping(true);
         setVideoOrientation();
     }
 

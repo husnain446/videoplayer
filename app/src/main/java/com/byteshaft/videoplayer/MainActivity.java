@@ -33,7 +33,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         VideosListFragment.VideosListListener {
 
     private ArrayAdapter<String> mModeAdapter;
-    private ArrayList<String> mVideosPathList;
+    static ArrayList<String> mVideosPathList;
     private String[] mVideosTitles;
     private CharSequence mDrawerTitle = "Video Player";
     private Helpers mHelper;
