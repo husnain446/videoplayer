@@ -199,23 +199,23 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     }
 
     private void showDetailsDialog() {
-        final String SPACE = "                    ";
+        final String SPACE = "          ";
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Details");
         StringBuilder stringBuilder = new StringBuilder();
-        if (mVideoTitle != null) { stringBuilder.append("Name:").append("\n").append(SPACE)
+        if (mVideoTitle != null) { stringBuilder.append("Name:").append(SPACE)
                 .append(mVideoTitle).append("\n"); }
-        if (mVideoDateCreated != null) { stringBuilder.append("Date:").append("\n")
+        if (mVideoDateCreated != null) { stringBuilder.append("Date:")
                 .append(SPACE).append(mVideoDateCreated).append("\n"); }
-        if (mVideoResolution != null) { stringBuilder.append("Resolution:").append("\n")
+        if (mVideoResolution != null) { stringBuilder.append("Resolution:")
                 .append(SPACE).append(mVideoResolution).append("\n"); }
-        if (mVideoAlbum != null) { stringBuilder.append("Album:").append("\n")
+        if (mVideoAlbum != null) { stringBuilder.append("Album:")
                 .append(SPACE).append(mVideoAlbum).append("\n");  }
-        if (mVideoArtist != null) { stringBuilder.append("Artist:").append("\n")
+        if (mVideoArtist != null) { stringBuilder.append("Artist:")
                 .append(SPACE).append(mVideoArtist).append("\n"); }
-        if (mData != null) { stringBuilder.append("Location:").append("\n")
+        if (mData != null) { stringBuilder.append("Location:")
                 .append(SPACE).append(mData).append("\n"); }
-        if (mVideoCategory != null) { stringBuilder.append("Category:").append("\n")
+        if (mVideoCategory != null) { stringBuilder.append("Category:")
                 .append(SPACE).append(mVideoCategory).append("\n"); }
 
         builder.setMessage(stringBuilder);
