@@ -1,4 +1,4 @@
-package byteshaft.com.recorder;
+package com.byteshaft.videoplayer;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -23,8 +23,14 @@ public class BitmapCache {
     }
 
     static void addBitmapToMemoryCache(String key, Bitmap bitmap) {
-        if (getBitmapFromMemCache(key) == null) {
+        if (getBitmapFromMemCache(key) == null && bitmap != null) {
             mMemoryCache.put(key, bitmap);
+        }
+    }
+
+    static void removeBitmapFromMemoryCache(String key) {
+        if (getBitmapFromMemCache(key) != null) {
+            mMemoryCache.remove(key);
         }
     }
 

@@ -1,4 +1,4 @@
-package byteshaft.com.recorder;
+package com.byteshaft.videoplayer;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -25,6 +25,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -32,7 +33,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
         VideosListFragment.VideosListListener {
 
     private ArrayAdapter<String> mModeAdapter;
-    private ArrayList<String> mVideosPathList;
+    static ArrayList<String> mVideosPathList;
     private String[] mVideosTitles;
     private CharSequence mDrawerTitle = "Video Player";
     private Helpers mHelper;
@@ -115,9 +116,11 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
             holder.position = position;
             if (BitmapCache.getBitmapFromMemCache(String.valueOf(position)) == null) {
                 holder.thumbnail.setImageURI(null);
-                new ThumbnailCreationTask(getApplicationContext(), holder, position).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                new ThumbnailCreationTask(getApplicationContext(),
+                        holder, position).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             } else {
-                holder.thumbnail.setImageBitmap(BitmapCache.getBitmapFromMemCache(String.valueOf(position)));
+                holder.thumbnail.setImageBitmap(BitmapCache.getBitmapFromMemCache
+                        (String.valueOf(position)));
             }
             return convertView;
         }
@@ -179,7 +182,8 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
 
     @Override
     public boolean onContextItemSelected (final MenuItem item){
-        final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        final AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)
+                item.getMenuInfo();
         int menuItemIndex = item.getItemId();
         String[] menuItems = {"Play", "Delete" , "Details"};
         String menuItemName = menuItems[menuItemIndex];
@@ -281,7 +285,9 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
             public void onClick(DialogInterface dialog, int which) {
                 mHelper.deleteFile(position);
                 mModeAdapter.remove(mModeAdapter.getItem(position));
+                BitmapCache.removeBitmapFromMemoryCache(String.valueOf(position));
                 mModeAdapter.notifyDataSetChanged();
+                Toast.makeText(getApplicationContext(),"file deleted",Toast.LENGTH_SHORT).show();
             }
         });
         builder.create();

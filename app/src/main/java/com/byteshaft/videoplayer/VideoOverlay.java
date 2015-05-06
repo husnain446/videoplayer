@@ -1,4 +1,4 @@
-package byteshaft.com.recorder;
+package com.byteshaft.videoplayer;
 
 import android.content.Context;
 import android.content.Intent;
@@ -85,7 +85,6 @@ public class VideoOverlay extends RelativeLayout implements SurfaceHolder.Callba
         if (mPlayOnStart) {
             mCustomVideoView.start();
         }
-
     }
 
     @Override
@@ -162,10 +161,10 @@ public class VideoOverlay extends RelativeLayout implements SurfaceHolder.Callba
     }
 
     @Override
-    public void onVideoViewPrepared() {
+    public void onVideoViewPrepared(MediaPlayer mp) {
 
     }
-
+    
     class GestureListener extends GestureDetector.SimpleOnGestureListener {
 
         private int initialX = 0;
