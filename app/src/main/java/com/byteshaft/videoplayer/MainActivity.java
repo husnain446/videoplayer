@@ -2,7 +2,6 @@ package com.byteshaft.videoplayer;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
-import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
@@ -12,11 +11,9 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.SearchView;
-import android.text.TextUtils;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,8 +26,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class MainActivity extends ActionBarActivity implements SearchView.OnQueryTextListener ,
-        VideosListFragment.VideosListListener {
+public class MainActivity extends ActionBarActivity implements VideosListFragment.VideosListListener {
 
     private ArrayAdapter<String> mModeAdapter;
     static ArrayList<String> mVideosPathList;
@@ -127,36 +123,6 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        SearchManager manager = (SearchManager) getSystemService(SEARCH_SERVICE);
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
-        MenuItem searchItem = menu.findItem(R.id.search);
-        searchView = (SearchView) searchItem.getActionView();
-        if (searchView != null) {
-            searchView.setSearchableInfo(manager.getSearchableInfo(getComponentName()));
-            searchView.setOnQueryTextListener(this);
-        }
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        mModeAdapter.getFilter().filter(query);
-        return true;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        if (TextUtils.isEmpty(newText)) {
-            mModeAdapter.getFilter().filter("");
-        } else {
-            mModeAdapter.getFilter().filter(newText);
-        }
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         return mDrawerToggle.onOptionsItemSelected(item) || super.onOptionsItemSelected(item);
     }
@@ -203,7 +169,7 @@ public class MainActivity extends ActionBarActivity implements SearchView.OnQuer
     }
 
     private void showDetailsDialog() {
-        final String SPACE = "                    ";
+        final String SPACE = "";
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Details");
         StringBuilder stringBuilder = new StringBuilder();
