@@ -1,9 +1,12 @@
 package com.byteshaft.videoplayer;
 
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -39,7 +42,6 @@ public class MainActivity extends ActionBarActivity implements VideosListFragmen
     private ActionBarDrawerToggle mDrawerToggle;
     private Fragment mFragment;
     private int mPositionGlobal;
-    SearchView searchView;
     VideosListFragment videosListFragment;
     String mVideoResolution;
     String mVideoDateCreated;
@@ -53,6 +55,8 @@ public class MainActivity extends ActionBarActivity implements VideosListFragmen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#689F39")));
         new BitmapCache();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mHelper = new Helpers(getApplicationContext());
