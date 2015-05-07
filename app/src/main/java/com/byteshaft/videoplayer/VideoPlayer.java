@@ -114,9 +114,15 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        Random random = new Random();
-        mHelpers.playVideoForLocation(MainActivity.mVideosPathList.get(
-                random.nextInt(MainActivity.mVideosPathList.size())), 0);
+        if (mHelpers.isRepeatEnabled()) {
+            mp.start();
+        } else if (mHelpers.isShuffleEnabled()){
+            Random random = new Random();
+            mHelpers.playVideoForLocation(MainActivity.mVideosPathList.get(
+                    random.nextInt(MainActivity.mVideosPathList.size())), 0);
+        }else {
+            finish();
+        }
     }
 
     @Override
@@ -126,7 +132,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
 
     @Override
     public void onVideoViewPrepared(MediaPlayer mp) {
-        mp.setLooping(mHelpers.isRepeatEnabled());
         setVideoOrientation();
     }
 
