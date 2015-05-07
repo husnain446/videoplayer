@@ -4,9 +4,11 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.TypedValue;
 import android.view.View;
@@ -14,12 +16,9 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import java.io.File;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Formatter;
 import java.util.Locale;
 
@@ -238,5 +237,19 @@ public class Helpers extends ContextWrapper {
     void setVolume(int level) {
         AudioManager am = (AudioManager) getSystemService(AUDIO_SERVICE);
         am.setStreamVolume(AudioManager.STREAM_MUSIC, level, 0);
+    }
+
+    boolean isRepeatEnabled() {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        return sharedPreferences.getBoolean("repeatEnabled", false);
+    }
+
+    void setRepeatEnabled(boolean enable) {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        sharedPreferences.edit().putBoolean("repeatEnabled", enable).apply();
+    }
+
+    private SharedPreferences getPreferenceManager() {
+        return  PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
     }
 }
