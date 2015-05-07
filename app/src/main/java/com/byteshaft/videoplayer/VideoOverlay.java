@@ -1,4 +1,4 @@
-package byteshaft.com.recorder;
+package com.byteshaft.videoplayer;
 
 import android.content.Context;
 import android.content.Intent;
