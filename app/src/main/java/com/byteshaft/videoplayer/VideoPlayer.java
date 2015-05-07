@@ -117,10 +117,10 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         if (mHelpers.isRepeatEnabled()) {
             mp.start();
         } else if (mHelpers.isShuffleEnabled()){
-            Random random = new Random();
+            Random randomizer = new Random();
             mHelpers.playVideoForLocation(MainActivity.mVideosPathList.get(
-                    random.nextInt(MainActivity.mVideosPathList.size())), 0);
-        }else {
+                    randomizer.nextInt(MainActivity.mVideosPathList.size())), 0);
+        } else {
             finish();
         }
     }

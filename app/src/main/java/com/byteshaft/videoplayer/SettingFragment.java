@@ -15,13 +15,13 @@ public class SettingFragment extends Fragment implements CheckBox.OnCheckedChang
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment, container, false);
-        CheckBox checkbox_repeat = (CheckBox) view.findViewById(R.id.checkbox_repeat);
-        CheckBox checkBox_shuffle = (CheckBox) view.findViewById(R.id.checkbox_shuffle);
-        checkbox_repeat.setOnCheckedChangeListener(this);
-        checkBox_shuffle.setOnCheckedChangeListener(this);
+        CheckBox checkBoxRepeat = (CheckBox) view.findViewById(R.id.checkbox_repeat);
+        CheckBox checkBoxShuffle = (CheckBox) view.findViewById(R.id.checkbox_shuffle);
+        checkBoxRepeat.setOnCheckedChangeListener(this);
+        checkBoxShuffle.setOnCheckedChangeListener(this);
         mHelpers = new Helpers(getActivity().getApplicationContext());
-        checkbox_repeat.setChecked(mHelpers.isRepeatEnabled());
-        checkBox_shuffle.setChecked(mHelpers.isShuffleEnabled());
+        checkBoxRepeat.setChecked(mHelpers.isRepeatEnabled());
+        checkBoxShuffle.setChecked(mHelpers.isShuffleEnabled());
         return view;
     }
 
@@ -34,6 +34,7 @@ public class SettingFragment extends Fragment implements CheckBox.OnCheckedChang
                 break;
             case R.id.checkbox_shuffle:
                 mHelpers.setShuffleEnabled(isChecked);
+                break;
         }
     }
 }
