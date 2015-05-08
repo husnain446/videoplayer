@@ -241,12 +241,12 @@ public class Helpers extends ContextWrapper {
 
     boolean isRepeatEnabled() {
         SharedPreferences sharedPreferences = getPreferenceManager();
-        return sharedPreferences.getBoolean("repeatEnabled", false);
+        return sharedPreferences.getBoolean("repeat_enabled", false);
     }
 
     void setRepeatEnabled(boolean enable) {
         SharedPreferences sharedPreferences = getPreferenceManager();
-        sharedPreferences.edit().putBoolean("repeatEnabled", enable).apply();
+        sharedPreferences.edit().putBoolean("repeat_enabled", enable).apply();
     }
 
     void setShuffleEnabled(boolean enable) {

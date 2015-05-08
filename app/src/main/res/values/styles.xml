@@ -2,7 +2,7 @@
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="android:showAsAction">always</item>
-        <item name="android:activatedBackgroundIndicator">@color/customColor</item>
+        <item name="android:activatedBackgroundIndicator">@drawable/activated_background</item>
         
     </style>
 
