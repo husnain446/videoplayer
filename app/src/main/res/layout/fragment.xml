@@ -21,8 +21,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:paddingLeft="15sp"
-                android:paddingTop="10sp"
-                />
+                android:paddingTop="10sp"/>
 
             <CheckBox
                 android:button="@drawable/custom_checkbox"
@@ -30,9 +29,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:padding="10sp"
-
-                />
+                android:padding="10sp"/>
 
         </RelativeLayout>
         <RelativeLayout
@@ -47,8 +44,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:paddingLeft="15sp"
-                android:paddingTop="5sp"
-                />
+                android:paddingTop="5sp"/>
 
             <CheckBox
                 android:button="@drawable/custom_checkbox"
@@ -56,8 +52,7 @@
                 android:padding="10sp"
                 android:layout_height="wrap_content"
                 android:id="@+id/checkbox_shuffle"
-                android:layout_alignParentRight="true"
-                />
+                android:layout_alignParentRight="true"/>
         </RelativeLayout>
     </LinearLayout>
 
