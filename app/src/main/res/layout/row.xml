@@ -15,7 +15,8 @@
             android:id="@+id/Thumbnail"
             android:layout_width="80dp"
             android:layout_height="60dp"
-            android:background="#000000"/>
+            android:background="#000000"
+            android:scaleType="centerCrop"/>
 
         <TextView android:id="@+id/tv"
             android:layout_width="wrap_content"

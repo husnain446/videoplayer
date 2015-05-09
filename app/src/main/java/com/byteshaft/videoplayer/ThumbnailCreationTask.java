@@ -36,7 +36,7 @@ public class ThumbnailCreationTask extends AsyncTask<Void, Void, Bitmap> {
                                                     (int) mHelpers.getDensityPixels(40),
                                                     (int) mHelpers.getDensityPixels(30));
         return MediaStore.Video.Thumbnails.getThumbnail(
-                mContext.getContentResolver(), id, MediaStore.Video.Thumbnails.MICRO_KIND, options);
+                mContext.getContentResolver(), id, MediaStore.Video.Thumbnails.MINI_KIND, options);
     }
 
     @Override
