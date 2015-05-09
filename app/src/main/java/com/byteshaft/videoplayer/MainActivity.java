@@ -115,7 +115,7 @@ public class MainActivity extends ActionBarActivity implements VideosListFragmen
             if (BitmapCache.getBitmapFromMemCache(String.valueOf(position)) == null) {
                 holder.thumbnail.setImageURI(null);
                 new ThumbnailCreationTask(getApplicationContext(),
-                        holder, position).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                        holder, position).execute();
             } else {
                 holder.thumbnail.setImageBitmap(BitmapCache.getBitmapFromMemCache
                         (String.valueOf(position)));
