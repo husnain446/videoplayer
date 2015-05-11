@@ -8,6 +8,7 @@ import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.support.v4.view.GestureDetectorCompat;
 import android.view.GestureDetector;
+import android.widget.FrameLayout;
 import android.widget.MediaController;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -22,6 +23,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     private CustomVideoView mCustomVideoView;
     private boolean isLandscape = true;
     private Helpers mHelpers;
+    private FrameLayout mFrameLayout;
     private Button mOverlayButton;
     private Button mRotationButton;
     private GestureDetectorCompat mDetector;
@@ -49,6 +51,8 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         mScreenStateListener = new ScreenStateListener(mCustomVideoView);
         final IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
         mDetector = new GestureDetectorCompat(this, new GestureListener());
+        mFrameLayout = (FrameLayout) findViewById(R.id.buttonsFrameLayout);
+        mFrameLayout.setVisibility(View.INVISIBLE);
         mOverlayButton = (Button) findViewById(R.id.overlayButton);
         mRotationButton = (Button) findViewById(R.id.bRotate);
         mOverlayButton.setOnClickListener(this);
@@ -144,6 +148,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         @Override
         public void show() {
             super.show();
+            mFrameLayout.setVisibility(VISIBLE);
             mOverlayButton.setVisibility(VISIBLE);
             mRotationButton.setVisibility(VISIBLE);
         }
@@ -151,6 +156,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         @Override
         public void hide() {
             super.hide();
+            mFrameLayout.setVisibility(INVISIBLE);
             mOverlayButton.setVisibility(INVISIBLE);
             mRotationButton.setVisibility(INVISIBLE);
         }
