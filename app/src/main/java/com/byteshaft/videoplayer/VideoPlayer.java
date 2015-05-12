@@ -50,10 +50,10 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         final IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
         mDetector = new GestureDetectorCompat(this, new GestureListener());
         mButtonsFrameTop = (FrameLayout) findViewById(R.id.buttons_frame_top);
-        Button mOverlayButton = (Button) findViewById(R.id.overlayButton);
-        Button mRotationButton = (Button) findViewById(R.id.bRotate);
-        mOverlayButton.setOnClickListener(this);
-        mRotationButton.setOnClickListener(this);
+        Button overlayButton = (Button) findViewById(R.id.overlayButton);
+        Button rotationButton = (Button) findViewById(R.id.bRotate);
+        overlayButton.setOnClickListener(this);
+        rotationButton.setOnClickListener(this);
         Bundle bundle = getIntent().getExtras();
         String videoPath = bundle.getString("videoUri");
         int seekPosition = bundle.getInt("startPosition");
