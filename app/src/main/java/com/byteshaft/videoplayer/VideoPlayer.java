@@ -23,7 +23,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     private CustomVideoView mCustomVideoView;
     private boolean isLandscape = true;
     private Helpers mHelpers;
-    private FrameLayout mTop_buttons_layout;
+    private FrameLayout mTopButtonsLayout;
     private GestureDetectorCompat mDetector;
     private ScreenStateListener mScreenStateListener;
 
@@ -49,7 +49,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         mScreenStateListener = new ScreenStateListener(mCustomVideoView);
         final IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
         mDetector = new GestureDetectorCompat(this, new GestureListener());
-        mTop_buttons_layout = (FrameLayout) findViewById(R.id.buttons_frame_top);
+        mTopButtonsLayout = (FrameLayout) findViewById(R.id.buttons_frame_top);
         Button mOverlayButton = (Button) findViewById(R.id.overlayButton);
         Button mRotationButton = (Button) findViewById(R.id.bRotate);
         mOverlayButton.setOnClickListener(this);
@@ -145,13 +145,13 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         @Override
         public void show() {
             super.show();
-            mTop_buttons_layout.setVisibility(VISIBLE);
+            mTopButtonsLayout.setVisibility(VISIBLE);
         }
 
         @Override
         public void hide() {
             super.hide();
-            mTop_buttons_layout.setVisibility(INVISIBLE);
+            mTopButtonsLayout.setVisibility(INVISIBLE);
         }
     }
 
