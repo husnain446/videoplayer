@@ -14,7 +14,7 @@
         android:layout_centerInParent="true"/>
 
     <FrameLayout
-        android:id="@+id/buttonsFrameLayout"
+        android:id="@+id/buttons_frame_top"
         android:layout_width="fill_parent"
         android:layout_height="50dp"
         android:visibility="gone"
