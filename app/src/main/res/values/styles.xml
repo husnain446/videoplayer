@@ -9,7 +9,6 @@
 
     <style name="PlayerTheme" parent="Theme.AppCompat.Light">
         <item name="android:windowNoTitle">true</item>
-        <item name="android:windowFullscreen">true</item>
     </style>
 
 </resources>

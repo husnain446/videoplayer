@@ -52,7 +52,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         final IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
         mDetector = new GestureDetectorCompat(this, new GestureListener());
         mFrameLayout = (FrameLayout) findViewById(R.id.buttonsFrameLayout);
-        mFrameLayout.setVisibility(View.INVISIBLE);
         mOverlayButton = (Button) findViewById(R.id.overlayButton);
         mRotationButton = (Button) findViewById(R.id.bRotate);
         mOverlayButton.setOnClickListener(this);
@@ -149,16 +148,12 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         public void show() {
             super.show();
             mFrameLayout.setVisibility(VISIBLE);
-            mOverlayButton.setVisibility(VISIBLE);
-            mRotationButton.setVisibility(VISIBLE);
         }
 
         @Override
         public void hide() {
             super.hide();
             mFrameLayout.setVisibility(INVISIBLE);
-            mOverlayButton.setVisibility(INVISIBLE);
-            mRotationButton.setVisibility(INVISIBLE);
         }
     }
 
