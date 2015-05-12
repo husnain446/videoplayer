@@ -24,8 +24,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     private boolean isLandscape = true;
     private Helpers mHelpers;
     private FrameLayout mFrameLayout;
-    private Button mOverlayButton;
-    private Button mRotationButton;
     private GestureDetectorCompat mDetector;
     private ScreenStateListener mScreenStateListener;
 
@@ -52,8 +50,8 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         final IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
         mDetector = new GestureDetectorCompat(this, new GestureListener());
         mFrameLayout = (FrameLayout) findViewById(R.id.buttonsFrameLayout);
-        mOverlayButton = (Button) findViewById(R.id.overlayButton);
-        mRotationButton = (Button) findViewById(R.id.bRotate);
+        Button mOverlayButton = (Button) findViewById(R.id.overlayButton);
+        Button mRotationButton = (Button) findViewById(R.id.bRotate);
         mOverlayButton.setOnClickListener(this);
         mRotationButton.setOnClickListener(this);
         Bundle bundle = getIntent().getExtras();
