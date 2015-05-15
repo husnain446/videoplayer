@@ -9,11 +9,13 @@ import android.media.MediaPlayer;
 import android.support.v4.view.GestureDetectorCompat;
 import android.view.GestureDetector;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.MediaController;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ToggleButton;
 
 import java.util.Random;
 
@@ -26,6 +28,11 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     private FrameLayout mButtonsFrameTop;
     private GestureDetectorCompat mDetector;
     private ScreenStateListener mScreenStateListener;
+    private static final int sDefaultTimeout = 3000;
+    private ToggleButton mButtonPausePlay;
+    private ImageButton mButtonForward;
+    private ImageButton mButtonRewind;
+
 
     private static class Screen {
         static class Brightness {
@@ -52,6 +59,9 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         mButtonsFrameTop = (FrameLayout) findViewById(R.id.buttons_frame_top);
         Button overlayButton = (Button) findViewById(R.id.overlayButton);
         Button rotationButton = (Button) findViewById(R.id.bRotate);
+        mButtonPausePlay = (ToggleButton) findViewById(R.id.toggle);
+        mButtonForward = (ImageButton) findViewById(R.id.button_forward);
+        mButtonRewind = (ImageButton) findViewById(R.id.button_rewind);
         overlayButton.setOnClickListener(this);
         rotationButton.setOnClickListener(this);
         Bundle bundle = getIntent().getExtras();
@@ -61,13 +71,16 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         mCustomVideoView.setMediaPlayerStateChangedListener(this);
         mCustomVideoView.setOnCompletionListener(this);
         mHelpers.setScreenBrightness(getWindow(), Screen.Brightness.HIGH);
-        CustomMediaController mediaController = new CustomMediaController(this);
-        mediaController.setAnchorView(mCustomVideoView);
-        mCustomVideoView.setMediaController(mediaController);
+//        CustomMediaController mediaController = new CustomMediaController(this);
+//        mediaController.setAnchorView(mCustomVideoView);
+//        mCustomVideoView.setMediaController(mediaController);
         registerReceiver(mScreenStateListener, filter);
         mCustomVideoView.setVideoPath(videoPath);
         mCustomVideoView.seekTo(seekPosition);
         mCustomVideoView.start();
+        mButtonPausePlay.setOnClickListener(this);
+        mButtonForward.setOnClickListener(this);
+        mButtonRewind.setOnClickListener(this);
     }
 
     @Override
@@ -110,6 +123,24 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
                 }
                 isLandscape = !isLandscape;
                 break;
+            case R.id.toggle:
+                if (mCustomVideoView.isPlaying()) {
+                    mCustomVideoView.pause();
+
+                } else {
+                    mCustomVideoView.start();
+
+                }
+                break;
+            case R.id.button_forward:
+                if (mCustomVideoView.isPlaying()) {
+                    mCustomVideoView.seekTo(mCustomVideoView.getCurrentPosition() + sDefaultTimeout);
+                }
+                break;
+            case R.id.button_rewind:
+                if (mCustomVideoView.isPlaying()) {
+                    mCustomVideoView.seekTo(mCustomVideoView.getCurrentPosition() - sDefaultTimeout);
+                }
         }
     }
 
