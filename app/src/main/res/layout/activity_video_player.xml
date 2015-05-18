@@ -32,23 +32,14 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:visibility="visible"
-        android:background="@color/hint_foreground_material_light">
+        android:background="@color/hint_foreground_material_light"
+        android:id="@+id/frameLayout">
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:orientation="vertical"
-            android:layout_gravity="left">
-
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content">
-                <SeekBar
-                    android:id="@+id/media_controller_progress"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
+            android:layout_gravity="left|center_vertical">
 
             <RelativeLayout
                 android:layout_width="fill_parent"
@@ -89,6 +80,10 @@
                     android:layout_marginStart="31dp" />
 
             </RelativeLayout>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
 
             <Button
                 android:id="@+id/bRotate"
@@ -102,13 +97,23 @@
 
             <Button
                 android:id="@+id/overlayButton"
-                android:background="@drawable/layout"
-                android:layout_gravity="center_vertical"
-                android:layout_width="50dip"
-                android:layout_height="40dip"
-                android:layout_marginLeft="5dp"/>
+                android:background="@drawable/button_layout"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="left"
+                android:layout_centerVertical="true"/>
+            </RelativeLayout>
 
         </LinearLayout>
     </FrameLayout>
+
+    <SeekBar
+        android:id="@+id/media_controller_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/frameLayout"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
 </RelativeLayout>

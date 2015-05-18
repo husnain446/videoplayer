@@ -15,12 +15,13 @@ import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.ToggleButton;
 
 import java.util.Random;
 
 public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionListener,
-        View.OnClickListener, CustomVideoView.MediaPlayerStateChangedListener {
+        View.OnClickListener, CustomVideoView.MediaPlayerStateChangedListener, SeekBar.OnSeekBarChangeListener {
 
     private CustomVideoView mCustomVideoView;
     private boolean isLandscape = true;
@@ -32,6 +33,25 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     private ToggleButton mButtonPausePlay;
     private ImageButton mButtonForward;
     private ImageButton mButtonRewind;
+    private SeekBar mSeekBar;
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        if (fromUser) {
+            mCustomVideoView.seekTo(progress);
+        }
+
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
+    }
 
 
     private static class Screen {
@@ -62,6 +82,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         mButtonPausePlay = (ToggleButton) findViewById(R.id.toggle);
         mButtonForward = (ImageButton) findViewById(R.id.button_forward);
         mButtonRewind = (ImageButton) findViewById(R.id.button_rewind);
+        mSeekBar = (SeekBar) findViewById(R.id.media_controller_progress);
         overlayButton.setOnClickListener(this);
         rotationButton.setOnClickListener(this);
         Bundle bundle = getIntent().getExtras();
@@ -81,6 +102,7 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         mButtonPausePlay.setOnClickListener(this);
         mButtonForward.setOnClickListener(this);
         mButtonRewind.setOnClickListener(this);
+        mSeekBar.setOnSeekBarChangeListener(this);
     }
 
     @Override
@@ -165,7 +187,10 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     @Override
     public void onVideoViewPrepared(MediaPlayer mp) {
         setVideoOrientation();
+        mSeekBar.setMax(mCustomVideoView.getDuration());
+        mSeekBar.postDelayed(onEverySecond, 1000);
     }
+
 
     class CustomMediaController extends MediaController {
 
@@ -250,4 +275,22 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
     }
+
+    private Runnable onEverySecond = new Runnable() {
+
+        @Override
+        public void run() {
+
+            if(mSeekBar != null) {
+                mSeekBar.setProgress(mCustomVideoView.getCurrentPosition());
+            }
+
+            if(mCustomVideoView.isPlaying()) {
+                if (mSeekBar != null) {
+                    mSeekBar.postDelayed(onEverySecond, 1000);
+                }
+            }
+
+        }
+    };
 }
