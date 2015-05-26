@@ -30,9 +30,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     private GestureDetectorCompat mDetector;
     private ScreenStateListener mScreenStateListener;
     private static final int sDefaultTimeout = 3000;
-    private ToggleButton mButtonPausePlay;
-    private ImageButton mButtonForward;
-    private ImageButton mButtonRewind;
     private SeekBar mSeekBar;
 
     @Override
@@ -79,9 +76,9 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         mButtonsFrameTop = (FrameLayout) findViewById(R.id.buttons_frame_top);
         Button overlayButton = (Button) findViewById(R.id.overlayButton);
         Button rotationButton = (Button) findViewById(R.id.bRotate);
-        mButtonPausePlay = (ToggleButton) findViewById(R.id.toggle);
-        mButtonForward = (ImageButton) findViewById(R.id.button_forward);
-        mButtonRewind = (ImageButton) findViewById(R.id.button_rewind);
+        ToggleButton mButtonPausePlay = (ToggleButton) findViewById(R.id.toggle);
+        ImageButton mButtonForward = (ImageButton) findViewById(R.id.button_forward);
+        ImageButton mButtonRewind = (ImageButton) findViewById(R.id.button_rewind);
         mSeekBar = (SeekBar) findViewById(R.id.media_controller_progress);
         overlayButton.setOnClickListener(this);
         rotationButton.setOnClickListener(this);
@@ -157,11 +154,13 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
             case R.id.button_forward:
                 if (mCustomVideoView.isPlaying()) {
                     mCustomVideoView.seekTo(mCustomVideoView.getCurrentPosition() + sDefaultTimeout);
+                    mSeekBar.postDelayed(onEverySecond, 3000);
                 }
                 break;
             case R.id.button_rewind:
                 if (mCustomVideoView.isPlaying()) {
                     mCustomVideoView.seekTo(mCustomVideoView.getCurrentPosition() - sDefaultTimeout);
+                    mSeekBar.postDelayed(onEverySecond, 3000);
                 }
         }
     }
