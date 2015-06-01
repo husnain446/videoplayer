@@ -83,6 +83,15 @@ public class Helpers extends ContextWrapper {
         startActivity(intent);
     }
 
+    void playVideoForTextView(String filename, int startPosition, int textViewPosition) {
+        Intent intent = new Intent(getApplicationContext(), VideoPlayer.class);
+        intent.putExtra("videoUri", filename);
+        intent.putExtra("startPosition", startPosition);
+        intent.putExtra("TextView", textViewPosition);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
     void deleteFile(int databaseIndex) {
         String[] projection = {MediaStore.Video.Media._ID};
         Cursor cursor = getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI,

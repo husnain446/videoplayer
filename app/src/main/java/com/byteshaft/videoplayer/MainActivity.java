@@ -78,7 +78,8 @@ public class MainActivity extends ActionBarActivity implements VideosListFragmen
 
     @Override
     public void onVideoSelected(int position) {
-        mHelper.playVideoForLocation(mVideosPathList.get(position), 0);
+//        mHelper.playVideoForLocation(mVideosPathList.get(position), 0);
+        mHelper.playVideoForTextView(mVideosPathList.get(position), 0 , position);
     }
 
     @Override

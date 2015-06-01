@@ -1,36 +1,36 @@
 package com.byteshaft.videoplayer;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.support.v4.view.GestureDetectorCompat;
 import android.view.GestureDetector;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.MediaController;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import java.util.Random;
 
 public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionListener,
-        View.OnClickListener, CustomVideoView.MediaPlayerStateChangedListener, SeekBar.OnSeekBarChangeListener {
+        View.OnClickListener, CustomVideoView.MediaPlayerStateChangedListener,
+        SeekBar.OnSeekBarChangeListener {
 
     private CustomVideoView mCustomVideoView;
     private boolean isLandscape = true;
     private Helpers mHelpers;
-    private FrameLayout mButtonsFrameTop;
     private GestureDetectorCompat mDetector;
     private ScreenStateListener mScreenStateListener;
     private static final int sDefaultTimeout = 3000;
     private SeekBar mSeekBar;
+    private TextView mStartTime;
+    private TextView mEndTime;
 
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -49,7 +49,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
     public void onStopTrackingTouch(SeekBar seekBar) {
 
     }
-
 
     private static class Screen {
         static class Brightness {
@@ -73,25 +72,24 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         mScreenStateListener = new ScreenStateListener(mCustomVideoView);
         final IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
         mDetector = new GestureDetectorCompat(this, new GestureListener());
-        mButtonsFrameTop = (FrameLayout) findViewById(R.id.buttons_frame_top);
         Button overlayButton = (Button) findViewById(R.id.overlayButton);
         Button rotationButton = (Button) findViewById(R.id.bRotate);
         ToggleButton mButtonPausePlay = (ToggleButton) findViewById(R.id.toggle);
         ImageButton mButtonForward = (ImageButton) findViewById(R.id.button_forward);
         ImageButton mButtonRewind = (ImageButton) findViewById(R.id.button_rewind);
         mSeekBar = (SeekBar) findViewById(R.id.media_controller_progress);
+        mStartTime = (TextView) findViewById(R.id.video_staring_time);
+        mEndTime = (TextView) findViewById(R.id.video_end_time);
         overlayButton.setOnClickListener(this);
         rotationButton.setOnClickListener(this);
         Bundle bundle = getIntent().getExtras();
         String videoPath = bundle.getString("videoUri");
         int seekPosition = bundle.getInt("startPosition");
+        int videopos = bundle.getInt("TextView");
         mCustomVideoView = (CustomVideoView) findViewById(R.id.videoSurface);
         mCustomVideoView.setMediaPlayerStateChangedListener(this);
         mCustomVideoView.setOnCompletionListener(this);
         mHelpers.setScreenBrightness(getWindow(), Screen.Brightness.HIGH);
-//        CustomMediaController mediaController = new CustomMediaController(this);
-//        mediaController.setAnchorView(mCustomVideoView);
-//        mCustomVideoView.setMediaController(mediaController);
         registerReceiver(mScreenStateListener, filter);
         mCustomVideoView.setVideoPath(videoPath);
         mCustomVideoView.seekTo(seekPosition);
@@ -100,6 +98,8 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         mButtonForward.setOnClickListener(this);
         mButtonRewind.setOnClickListener(this);
         mSeekBar.setOnSeekBarChangeListener(this);
+        mStartTime.setText(mHelpers.getFormattedTime(mCustomVideoView.getDuration()));
+        mEndTime.setText(mHelpers.getFormattedTime(mHelpers.getDurationForVideo(videopos)));
     }
 
     @Override
@@ -152,15 +152,15 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
                 }
                 break;
             case R.id.button_forward:
-                if (mCustomVideoView.isPlaying()) {
+                if (mCustomVideoView.isPlaying() && isVideoAtLastThreeSeconds()) {
                     mCustomVideoView.seekTo(mCustomVideoView.getCurrentPosition() + sDefaultTimeout);
-                    mSeekBar.postDelayed(onEverySecond, 3000);
+                    mSeekBar.postDelayed(onEverySecond, 2000);
                 }
                 break;
             case R.id.button_rewind:
                 if (mCustomVideoView.isPlaying()) {
                     mCustomVideoView.seekTo(mCustomVideoView.getCurrentPosition() - sDefaultTimeout);
-                    mSeekBar.postDelayed(onEverySecond, 3000);
+                    mSeekBar.postDelayed(onEverySecond, 2000);
                 }
         }
     }
@@ -188,26 +188,6 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
         setVideoOrientation();
         mSeekBar.setMax(mCustomVideoView.getDuration());
         mSeekBar.postDelayed(onEverySecond, 1000);
-    }
-
-
-    class CustomMediaController extends MediaController {
-
-        public CustomMediaController(Context context) {
-            super(context);
-        }
-
-        @Override
-        public void show() {
-            super.show();
-            mButtonsFrameTop.setVisibility(VISIBLE);
-        }
-
-        @Override
-        public void hide() {
-            super.hide();
-            mButtonsFrameTop.setVisibility(INVISIBLE);
-        }
     }
 
     class GestureListener extends GestureDetector.SimpleOnGestureListener {
@@ -292,4 +272,9 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
 
         }
     };
+
+    private boolean isVideoAtLastThreeSeconds() {
+        int currentPosition = mCustomVideoView.getCurrentPosition();
+        return currentPosition + 3000 <= mCustomVideoView.getDuration();
+    }
 }
