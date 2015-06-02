@@ -126,6 +126,7 @@
                 <TextView
                     android:id="@+id/video_end_time"
                     android:text="endTime"
+                    android:textColor="#FFF"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_above="@+id/relativeLayout"
@@ -135,6 +136,7 @@
                 <TextView
                     android:id="@+id/video_staring_time"
                     android:text="startTime"
+                    android:textColor="#FFF"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignTop="@+id/video_end_time"

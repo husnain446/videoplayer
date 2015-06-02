@@ -145,9 +145,16 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
             case R.id.toggle:
                 if (mCustomVideoView.isPlaying()) {
                     mCustomVideoView.pause();
+                    mSeekBar.postDelayed(onEverySecond, 0);
+                    mStartTime.setText(mHelpers.getFormattedTime(mCustomVideoView.getCurrentPosition()));
 
                 } else {
                     mCustomVideoView.start();
+                    mStartTime.setText(mHelpers.getFormattedTime(mCustomVideoView.getCurrentPosition()));
+                    mSeekBar.postDelayed(onEverySecond, 1000);
+                    mSeekBar.postDelayed(onEverySecond, 0);
+
+
 
                 }
                 break;
@@ -259,17 +266,16 @@ public class VideoPlayer extends Activity implements MediaPlayer.OnCompletionLis
 
         @Override
         public void run() {
-
-            if(mSeekBar != null) {
+            if (mSeekBar != null) {
                 mSeekBar.setProgress(mCustomVideoView.getCurrentPosition());
             }
 
-            if(mCustomVideoView.isPlaying()) {
+            if (mCustomVideoView.isPlaying()) {
                 if (mSeekBar != null) {
                     mSeekBar.postDelayed(onEverySecond, 1000);
                 }
+                mStartTime.setText(mHelpers.getFormattedTime(mCustomVideoView.getCurrentPosition()));
             }
-
         }
     };
 
